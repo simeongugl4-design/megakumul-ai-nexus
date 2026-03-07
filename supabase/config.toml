@@ -1,0 +1,4 @@
+project_id = "khwjrkficzshbcfnppfn"
+
+[functions.mega-chat]
+verify_jwt = false
