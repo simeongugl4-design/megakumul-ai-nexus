@@ -20,14 +20,13 @@ serve(async (req) => {
         "Content-Type": "application/json",
       },
       body: JSON.stringify({
-        model: "google/gemini-2.5-flash-image",
+        model: "google/gemini-3-pro-image-preview",
         messages: [
           {
             role: "user",
-            content: `Create a clear, professional, educational diagram or graph illustration for the following topic. Make it colorful, well-labeled with axis labels, titles, and annotations. Use a clean white background. Style it like a textbook illustration with clear mathematical notation: ${prompt}`,
+            content: `Create a clear, professional, educational diagram or graph illustration for the following topic. Make it colorful, well-labeled with axis labels, titles, and annotations. Use a clean white background. Style it like a textbook illustration with clear mathematical notation. DO NOT use dotted lines - use solid lines only: ${prompt}`,
           },
         ],
-        modalities: ["image", "text"],
       }),
     });
 
