@@ -57,7 +57,7 @@ export function ChatMessages({ messages, isLoading, onSend }: ChatMessagesProps)
 
   if (messages.length === 0) {
     return (
-      <div className="flex flex-1 flex-col items-center justify-center gap-6 px-4">
+      <div className="flex flex-1 flex-col items-center justify-center gap-8 px-4 py-8">
         <motion.div
           initial={{ opacity: 0, scale: 0.8 }}
           animate={{ opacity: 1, scale: 1 }}
@@ -79,23 +79,32 @@ export function ChatMessages({ messages, isLoading, onSend }: ChatMessagesProps)
             Your AI research & intelligence platform. Ask anything, research deeply, generate code, and more.
           </p>
         </motion.div>
+
+        {/* Prominent suggestion prompts */}
         <motion.div
           initial={{ opacity: 0, y: 20 }}
           animate={{ opacity: 1, y: 0 }}
           transition={{ delay: 0.4 }}
-          className="grid grid-cols-1 gap-3 sm:grid-cols-2"
+          className="w-full max-w-2xl"
         >
-          {suggestedPrompts.map((prompt) => (
-            <motion.button
-              key={prompt}
-              whileHover={{ scale: 1.02, y: -2 }}
-              whileTap={{ scale: 0.98 }}
-              onClick={() => onSend?.(prompt)}
-              className="rounded-xl border border-border bg-card p-4 text-left text-sm text-muted-foreground transition-all hover:border-primary/50 hover:bg-surface-elevated hover:text-foreground"
-            >
-              {prompt}
-            </motion.button>
-          ))}
+          <p className="mb-3 text-center text-sm font-medium text-muted-foreground">Try one of these prompts:</p>
+          <div className="grid grid-cols-1 gap-3 sm:grid-cols-2">
+            {suggestedPrompts.map((prompt, i) => (
+              <motion.button
+                key={prompt}
+                initial={{ opacity: 0, y: 10 }}
+                animate={{ opacity: 1, y: 0 }}
+                transition={{ delay: 0.5 + i * 0.1 }}
+                whileHover={{ scale: 1.03, y: -2 }}
+                whileTap={{ scale: 0.97 }}
+                onClick={() => onSend?.(prompt)}
+                className="group flex items-start gap-3 rounded-xl border border-border bg-card p-4 text-left text-sm text-muted-foreground transition-all hover:border-primary/50 hover:bg-surface-elevated hover:text-foreground hover:glow-primary"
+              >
+                <ArrowRight className="mt-0.5 h-4 w-4 shrink-0 text-primary opacity-0 transition-opacity group-hover:opacity-100" />
+                <span>{prompt}</span>
+              </motion.button>
+            ))}
+          </div>
         </motion.div>
       </div>
     );
