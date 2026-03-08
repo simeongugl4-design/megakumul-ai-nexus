@@ -5,3 +5,15 @@ verify_jwt = false
 
 [functions.mega-research]
 verify_jwt = false
+
+[functions.mega-code]
+verify_jwt = false
+
+[functions.mega-image]
+verify_jwt = false
+
+[functions.mega-document]
+verify_jwt = false
+
+[functions.mega-math]
+verify_jwt = false
