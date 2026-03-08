@@ -1,4 +1,4 @@
-import { useState } from "react";
+import { useState, useEffect, useRef } from "react";
 import { motion } from "framer-motion";
 import { Loader2, Sparkles, Image as ImageIcon } from "lucide-react";
 import { useDiagramGenerator } from "@/hooks/use-diagram-generator";
@@ -9,19 +9,31 @@ interface DiagramPanelProps {
   autoGenerate?: boolean;
 }
 
-export function DiagramPanel({ query, autoGenerate }: DiagramPanelProps) {
+export function DiagramPanel({ query, autoGenerate = false }: DiagramPanelProps) {
   const { imageUrl, text, isLoading, error, generate } = useDiagramGenerator();
   const [customPrompt, setCustomPrompt] = useState("");
+  const lastAutoQuery = useRef("");
+
+  // Auto-generate diagram when query changes and autoGenerate is true
+  useEffect(() => {
+    if (autoGenerate && query && query !== lastAutoQuery.current) {
+      lastAutoQuery.current = query;
+      generate(query);
+    }
+  }, [query, autoGenerate, generate]);
 
   const handleGenerate = () => {
     const prompt = customPrompt.trim() || query;
-    if (prompt) generate(prompt);
+    if (prompt) {
+      lastAutoQuery.current = prompt;
+      generate(prompt);
+    }
   };
 
   return (
     <div className="space-y-4">
-      {/* Generate button */}
-      {!imageUrl && !isLoading && (
+      {/* Generate button - shown when no image and not loading */}
+      {!imageUrl && !isLoading && !error && (
         <motion.div
           initial={{ opacity: 0, y: 10 }}
           animate={{ opacity: 1, y: 0 }}
