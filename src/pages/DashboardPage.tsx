@@ -4,6 +4,7 @@ import { useNavigate } from "react-router-dom";
 import { TopNav } from "@/components/TopNav";
 import { useState, useRef } from "react";
 import { Boxes } from "@/components/ui/background-boxes";
+import { SparklesCore } from "@/components/ui/sparkles";
 
 const features = [
   {
@@ -84,8 +85,20 @@ export default function DashboardPage() {
           </div>
           {/* Radial mask overlay */}
           <div className="absolute inset-0 z-10 bg-background/80 [mask-image:radial-gradient(ellipse_60%_60%_at_50%_50%,transparent_20%,black_70%)]" />
+          {/* Sparkles layer */}
+          <div className="absolute inset-0 z-[11]">
+            <SparklesCore
+              background="transparent"
+              minSize={0.6}
+              maxSize={1.4}
+              particleDensity={80}
+              className="h-full w-full"
+              particleColor="hsl(195, 100%, 50%)"
+              speed={2}
+            />
+          </div>
           {/* Gradient overlay for depth */}
-          <div className="absolute inset-0 z-10 bg-gradient-to-b from-background/40 via-transparent to-background" />
+          <div className="absolute inset-0 z-[12] bg-gradient-to-b from-background/40 via-transparent to-background pointer-events-none" />
 
           {/* Hero Content */}
           <motion.div
