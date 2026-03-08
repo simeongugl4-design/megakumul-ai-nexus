@@ -1,0 +1,113 @@
+import { useState, useRef } from "react";
+import { motion } from "framer-motion";
+import ReactMarkdown from "react-markdown";
+import remarkGfm from "remark-gfm";
+import remarkMath from "remark-math";
+import rehypeKatex from "rehype-katex";
+import { ImageIcon, ArrowRight, Loader2, RotateCcw, Sparkles, Eye } from "lucide-react";
+import { useImageAI } from "@/hooks/use-image-ai";
+import { TopNav } from "@/components/TopNav";
+
+const actions = [
+  { id: "generate", label: "Generate Prompt", icon: Sparkles, desc: "Create an image prompt" },
+  { id: "analyze", label: "Analyze Image", icon: Eye, desc: "Describe or analyze a visual" },
+];
+
+const suggestions = [
+  "Create a prompt for a futuristic cyberpunk cityscape at night",
+  "Describe how to create a watercolor painting of a mountain landscape",
+  "Generate a detailed prompt for a photorealistic portrait with dramatic lighting",
+  "Create a logo concept for a tech startup called NeuralFlow",
+];
+
+export default function ImageAIPage() {
+  const { content, isLoading, error, generate, clear } = useImageAI();
+  const [input, setInput] = useState("");
+  const [action, setAction] = useState("generate");
+  const [selectedModel, setSelectedModel] = useState("creative");
+  const inputRef = useRef<HTMLTextAreaElement>(null);
+
+  const handleSubmit = (e?: React.FormEvent) => {
+    e?.preventDefault();
+    if (!input.trim() || isLoading) return;
+    generate(input.trim(), action);
+  };
+
+  const hasResults = content.length > 0 || isLoading;
+
+  return (
+    <div className="flex h-screen flex-col">
+      <TopNav selectedModel={selectedModel} onModelChange={setSelectedModel} />
+      <div className="flex-1 overflow-y-auto scrollbar-thin">
+        {!hasResults ? (
+          <div className="flex flex-1 flex-col items-center justify-center px-4 py-16 min-h-[calc(100vh-3.5rem)]">
+            <motion.div initial={{ opacity: 0, scale: 0.8 }} animate={{ opacity: 1, scale: 1 }} className="mb-8 flex h-20 w-20 items-center justify-center rounded-2xl bg-[hsl(45,90%,55%)] shadow-[0_0_20px_hsl(45,90%,55%,0.3)]">
+              <ImageIcon className="h-10 w-10 text-background" />
+            </motion.div>
+            <motion.div initial={{ opacity: 0, y: 20 }} animate={{ opacity: 1, y: 0 }} transition={{ delay: 0.15 }} className="text-center mb-8">
+              <h1 className="text-4xl font-heading font-bold gradient-text mb-3">Image AI</h1>
+              <p className="max-w-lg text-muted-foreground">AI-powered image prompt generation, visual analysis, and creative direction</p>
+            </motion.div>
+
+            <motion.div initial={{ opacity: 0, y: 20 }} animate={{ opacity: 1, y: 0 }} transition={{ delay: 0.25 }} className="flex gap-3 mb-8">
+              {actions.map((a) => (
+                <button key={a.id} onClick={() => setAction(a.id)} className={`flex items-center gap-2 rounded-xl border px-5 py-3 text-sm font-medium transition-all ${action === a.id ? "border-[hsl(45,90%,55%)] bg-[hsl(45,90%,55%)]/10 text-[hsl(45,90%,55%)]" : "border-border text-muted-foreground hover:text-foreground"}`}>
+                  <a.icon className="h-4 w-4" /> {a.label}
+                </button>
+              ))}
+            </motion.div>
+
+            <motion.form initial={{ opacity: 0, y: 20 }} animate={{ opacity: 1, y: 0 }} transition={{ delay: 0.35 }} onSubmit={handleSubmit} className="w-full max-w-2xl mb-8">
+              <div className="rounded-2xl border border-border bg-card p-3 focus-within:border-[hsl(45,90%,55%)]/50">
+                <textarea ref={inputRef} value={input} onChange={(e) => setInput(e.target.value)} placeholder={action === "analyze" ? "Describe the image you want analyzed..." : "Describe what kind of image you want to create..."} rows={3} className="w-full bg-transparent text-sm text-foreground placeholder:text-muted-foreground focus:outline-none resize-none" onKeyDown={(e) => { if (e.key === "Enter" && (e.metaKey || e.ctrlKey)) handleSubmit(); }} />
+                <div className="flex justify-end mt-2">
+                  <button type="submit" disabled={!input.trim()} className="rounded-xl px-5 py-2 text-sm font-medium bg-[hsl(45,90%,55%)] text-background transition-all disabled:opacity-30 hover:opacity-90">
+                    <ArrowRight className="h-4 w-4" />
+                  </button>
+                </div>
+              </div>
+            </motion.form>
+
+            <motion.div initial={{ opacity: 0, y: 20 }} animate={{ opacity: 1, y: 0 }} transition={{ delay: 0.45 }} className="w-full max-w-2xl">
+              <p className="text-center text-sm text-muted-foreground mb-4 font-medium">Try these:</p>
+              <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
+                {suggestions.map((s, i) => (
+                  <motion.button key={s} initial={{ opacity: 0, y: 10 }} animate={{ opacity: 1, y: 0 }} transition={{ delay: 0.5 + i * 0.07 }} whileHover={{ scale: 1.02 }} onClick={() => { setInput(s); generate(s, action); }} className="group flex items-start gap-3 rounded-xl border border-border bg-card p-3 text-left text-sm text-muted-foreground transition-all hover:border-[hsl(45,90%,55%)]/50 hover:text-foreground">
+                    <ImageIcon className="mt-0.5 h-3.5 w-3.5 shrink-0 text-[hsl(45,90%,55%)] opacity-60 group-hover:opacity-100" />
+                    <span className="line-clamp-2">{s}</span>
+                  </motion.button>
+                ))}
+              </div>
+            </motion.div>
+          </div>
+        ) : (
+          <div className="mx-auto max-w-4xl px-4 py-8">
+            <div className="flex items-center justify-between mb-6">
+              <div className="flex items-center gap-2 text-sm">
+                <ImageIcon className="h-4 w-4 text-[hsl(45,90%,55%)]" />
+                <span className="text-muted-foreground">Image AI</span>
+                {isLoading && <Loader2 className="h-3 w-3 animate-spin text-[hsl(45,90%,55%)]" />}
+              </div>
+              <button onClick={() => { clear(); setInput(""); }} className="flex items-center gap-1.5 rounded-lg border border-border px-3 py-1.5 text-xs text-muted-foreground hover:bg-muted hover:text-foreground">
+                <RotateCcw className="h-3 w-3" /> New
+              </button>
+            </div>
+            <div className="rounded-2xl border border-border bg-card p-6">
+              {error ? <p className="text-destructive">⚠️ {error}</p> : (
+                <div className="prose prose-sm prose-invert max-w-none prose-headings:font-heading prose-code:text-primary prose-pre:bg-muted prose-pre:border prose-pre:border-border">
+                  <ReactMarkdown remarkPlugins={[remarkGfm, remarkMath]} rehypePlugins={[rehypeKatex]}>{content}</ReactMarkdown>
+                </div>
+              )}
+            </div>
+            {!isLoading && (
+              <form onSubmit={handleSubmit} className="mt-4 flex items-center gap-2 rounded-xl border border-border bg-card p-2">
+                <textarea value={input} onChange={(e) => setInput(e.target.value)} placeholder="Ask a follow-up..." rows={1} className="flex-1 bg-transparent text-sm text-foreground placeholder:text-muted-foreground focus:outline-none resize-none" onKeyDown={(e) => { if (e.key === "Enter" && !e.shiftKey) { e.preventDefault(); handleSubmit(); } }} />
+                <button type="submit" disabled={!input.trim()} className="rounded-lg px-3 py-1.5 text-xs font-medium bg-[hsl(45,90%,55%)] text-background disabled:opacity-30">Go</button>
+              </form>
+            )}
+          </div>
+        )}
+      </div>
+    </div>
+  );
+}

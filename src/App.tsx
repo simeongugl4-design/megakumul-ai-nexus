@@ -8,6 +8,14 @@ import { AppSidebar } from "@/components/AppSidebar";
 import DashboardPage from "./pages/DashboardPage";
 import ChatPage from "./pages/ChatPage";
 import ResearchPage from "./pages/ResearchPage";
+import DocumentsPage from "./pages/DocumentsPage";
+import ImageAIPage from "./pages/ImageAIPage";
+import CodeAssistantPage from "./pages/CodeAssistantPage";
+import MathSolverPage from "./pages/MathSolverPage";
+import KnowledgeBasePage from "./pages/KnowledgeBasePage";
+import SavedResponsesPage from "./pages/SavedResponsesPage";
+import HistoryPage from "./pages/HistoryPage";
+import IntegrationsPage from "./pages/IntegrationsPage";
 import NotFound from "./pages/NotFound";
 
 const queryClient = new QueryClient();
@@ -50,14 +58,15 @@ const App = () => (
             <Route path="/" element={<DashboardPage />} />
             <Route path="/chat" element={<ChatPage />} />
             <Route path="/research" element={<ResearchPage />} />
-            <Route path="/documents" element={<PlaceholderPage title="Document Intelligence" description="Coming soon — upload and chat with your documents" />} />
-            <Route path="/image-ai" element={<PlaceholderPage title="Image AI" description="Coming soon — AI-powered image generation" />} />
-            <Route path="/code" element={<PlaceholderPage title="Code Assistant" description="Coming soon — generate, debug, and explain code" />} />
-            <Route path="/knowledge" element={<PlaceholderPage title="Knowledge Base" description="Coming soon — your personal knowledge graph" />} />
-            <Route path="/saved" element={<PlaceholderPage title="Saved Responses" description="Coming soon — save and organize AI responses" />} />
-            <Route path="/history" element={<PlaceholderPage title="History" description="Coming soon — browse your conversation history" />} />
-            <Route path="/integrations" element={<PlaceholderPage title="Integrations" description="Coming soon — connect your favorite tools" />} />
-            <Route path="/settings" element={<PlaceholderPage title="Settings" description="Coming soon — customize your MegaKUMUL experience" />} />
+            <Route path="/documents" element={<DocumentsPage />} />
+            <Route path="/image-ai" element={<ImageAIPage />} />
+            <Route path="/code" element={<CodeAssistantPage />} />
+            <Route path="/math" element={<MathSolverPage />} />
+            <Route path="/knowledge" element={<KnowledgeBasePage />} />
+            <Route path="/saved" element={<SavedResponsesPage />} />
+            <Route path="/history" element={<HistoryPage />} />
+            <Route path="/integrations" element={<IntegrationsPage />} />
+            <Route path="/settings" element={<PlaceholderPage title="Settings" description="Customize your MegaKUMUL experience" />} />
             <Route path="*" element={<NotFound />} />
           </Routes>
         </AppLayout>
