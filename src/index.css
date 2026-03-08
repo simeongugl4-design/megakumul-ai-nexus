@@ -115,6 +115,53 @@
   }
 }
 
+/* KaTeX Math Rendering - Textbook Quality */
+.katex {
+  font-size: 1.15em !important;
+  font-weight: 400;
+}
+
+.katex-display {
+  margin: 1.5em 0 !important;
+  padding: 1.25em 1.5em;
+  background: hsl(var(--muted) / 0.5);
+  border: 1px solid hsl(var(--border));
+  border-radius: 0.75rem;
+  overflow-x: auto;
+  overflow-y: hidden;
+}
+
+.katex-display > .katex {
+  font-size: 1.3em !important;
+}
+
+.prose .katex-display {
+  text-align: center;
+}
+
+/* Inline math styling */
+.katex:not(.katex-display .katex) {
+  padding: 0.1em 0.2em;
+  color: hsl(195, 100%, 70%);
+}
+
+/* Math fraction clarity */
+.katex .frac-line {
+  border-bottom-width: 0.06em !important;
+}
+
+/* Improve math table/matrix rendering */
+.katex .mtable .col-align-c > .vlist-t {
+  text-align: center;
+}
+
+/* Ensure math scrolls horizontally on small screens */
+.katex-display .katex-html {
+  overflow-x: auto;
+  overflow-y: hidden;
+  padding-bottom: 0.25em;
+}
+
 @keyframes pulse-glow {
   0%, 100% { opacity: 0.4; }
   50% { opacity: 1; }

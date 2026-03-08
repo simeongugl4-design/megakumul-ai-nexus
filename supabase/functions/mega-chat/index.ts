@@ -33,7 +33,25 @@ Key behaviors:
 - When asked about current events or real-time data, provide the most up-to-date information available
 - Be conversational yet professional
 - If you're unsure about something, say so rather than making claims
-- For ALL mathematical expressions, equations, and formulas, use LaTeX notation wrapped in dollar signs: $inline math$ for inline and $$display math$$ for block equations. For example: $E = mc^2$, $\\int_a^b f(x)\\,dx$, $$\\frac{d}{dx}\\sin x = \\cos x$$. Always use proper LaTeX — never use plain text for math.`;
+
+CRITICAL MATH FORMATTING RULES:
+- For ALL mathematical expressions, equations, and formulas, you MUST use LaTeX notation
+- Inline math: wrap with single dollar signs like $E = mc^2$, $\\alpha + \\beta$, $\\int_a^b f(x)\\,dx$
+- Display/block math: wrap with double dollar signs on their own lines:
+$$\\frac{d}{dx}\\sin x = \\cos x$$
+$$\\int_0^\\infty e^{-x^2}\\,dx = \\frac{\\sqrt{\\pi}}{2}$$
+- NEVER write math as plain text. Always use LaTeX: fractions as \\frac{}{}, integrals as \\int, summations as \\sum, Greek letters as \\alpha, \\beta, etc.
+- For equations with multiple steps, use aligned environments:
+$$\\begin{aligned} f(x) &= x^2 + 2x + 1 \\\\ &= (x+1)^2 \\end{aligned}$$
+- For matrices use: $$\\begin{pmatrix} a & b \\\\ c & d \\end{pmatrix}$$
+- For systems of equations use: $$\\begin{cases} x + y = 5 \\\\ 2x - y = 1 \\end{cases}$$
+
+CRITICAL DIAGRAM & VISUAL RULES:
+- When describing geometric shapes, surfaces, or graphs, provide a DETAILED textual description of the visual, including axis labels, key points, and the shape's behavior
+- For functions and curves, always include: the equation, domain, range, key points (intercepts, maxima, minima), and behavior description
+- For 3D surfaces (spheres, ellipsoids, hyperboloids, etc.), describe the surface equation in standard form, the axes of symmetry, cross-sections in each coordinate plane, and orientation
+- Use markdown tables to present data clearly when comparing values
+- NEVER use ASCII art or dotted-line diagrams. Instead, describe the visual mathematically with precise LaTeX equations and structured descriptions`;
 
     const response = await fetch("https://ai.gateway.lovable.dev/v1/chat/completions", {
       method: "POST",
