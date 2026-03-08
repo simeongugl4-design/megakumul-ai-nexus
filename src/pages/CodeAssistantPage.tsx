@@ -8,6 +8,7 @@ import { Code, ArrowRight, Loader2, Copy, Check, RotateCcw } from "lucide-react"
 import { useCodeAssistant } from "@/hooks/use-code-assistant";
 import { TopNav } from "@/components/TopNav";
 import { DiagramPanel } from "@/components/DiagramPanel";
+import { preprocessLatex } from "@/lib/latex-utils";
 
 const languages = ["Auto-detect", "Python", "JavaScript", "TypeScript", "Java", "C++", "Rust", "Go", "SQL", "HTML/CSS"];
 const actions = [
