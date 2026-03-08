@@ -49,7 +49,7 @@ const App = () => (
           <Routes>
             <Route path="/" element={<DashboardPage />} />
             <Route path="/chat" element={<ChatPage />} />
-            <Route path="/research" element={<PlaceholderPage title="Deep Research" description="Coming soon — real-time web research with citations" />} />
+            <Route path="/research" element={<ResearchPage />} />
             <Route path="/documents" element={<PlaceholderPage title="Document Intelligence" description="Coming soon — upload and chat with your documents" />} />
             <Route path="/image-ai" element={<PlaceholderPage title="Image AI" description="Coming soon — AI-powered image generation" />} />
             <Route path="/code" element={<PlaceholderPage title="Code Assistant" description="Coming soon — generate, debug, and explain code" />} />
