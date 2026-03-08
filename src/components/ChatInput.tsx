@@ -1,9 +1,12 @@
 import { useState, useRef, useEffect } from "react";
-import { Send, Mic, Paperclip, Sparkles, Code, Languages, FileSearch } from "lucide-react";
+import { Send, Mic, Paperclip, Sparkles, Code, Languages, FileSearch, X } from "lucide-react";
+import { motion, AnimatePresence } from "framer-motion";
 
 interface ChatInputProps {
   onSend: (message: string) => void;
   isLoading: boolean;
+  prefill?: string;
+  onPrefillUsed?: () => void;
 }
 
 const quickActions = [
@@ -13,9 +16,17 @@ const quickActions = [
   { icon: FileSearch, label: "Deep Research", prefix: "Research in depth: " },
 ];
 
-export function ChatInput({ onSend, isLoading }: ChatInputProps) {
+export function ChatInput({ onSend, isLoading, prefill, onPrefillUsed }: ChatInputProps) {
   const [input, setInput] = useState("");
   const textareaRef = useRef<HTMLTextAreaElement>(null);
+
+  useEffect(() => {
+    if (prefill) {
+      setInput(prefill);
+      onPrefillUsed?.();
+      setTimeout(() => textareaRef.current?.focus(), 50);
+    }
+  }, [prefill, onPrefillUsed]);
 
   useEffect(() => {
     if (textareaRef.current) {
@@ -44,14 +55,19 @@ export function ChatInput({ onSend, isLoading }: ChatInputProps) {
         {/* Quick actions */}
         <div className="mb-3 flex flex-wrap gap-2">
           {quickActions.map((action) => (
-            <button
+            <motion.button
               key={action.label}
-              onClick={() => setInput(action.prefix)}
+              whileHover={{ scale: 1.05 }}
+              whileTap={{ scale: 0.95 }}
+              onClick={() => {
+                setInput(action.prefix);
+                textareaRef.current?.focus();
+              }}
               className="flex items-center gap-1.5 rounded-lg border border-border bg-muted px-3 py-1.5 text-xs text-muted-foreground transition-all hover:border-primary/50 hover:text-foreground"
             >
               <action.icon className="h-3 w-3" />
               {action.label}
-            </button>
+            </motion.button>
           ))}
         </div>
 
@@ -71,17 +87,33 @@ export function ChatInput({ onSend, isLoading }: ChatInputProps) {
             className="max-h-[200px] min-h-[24px] flex-1 resize-none bg-transparent text-sm text-foreground placeholder:text-muted-foreground focus:outline-none"
           />
 
+          <AnimatePresence>
+            {input.trim() && (
+              <motion.button
+                initial={{ opacity: 0, scale: 0.8 }}
+                animate={{ opacity: 1, scale: 1 }}
+                exit={{ opacity: 0, scale: 0.8 }}
+                onClick={() => setInput("")}
+                className="shrink-0 rounded-lg p-2 text-muted-foreground transition-colors hover:bg-muted hover:text-foreground"
+              >
+                <X className="h-4 w-4" />
+              </motion.button>
+            )}
+          </AnimatePresence>
+
           <button className="shrink-0 rounded-lg p-2 text-muted-foreground transition-colors hover:bg-muted hover:text-foreground">
             <Mic className="h-4 w-4" />
           </button>
 
-          <button
+          <motion.button
+            whileHover={{ scale: 1.05 }}
+            whileTap={{ scale: 0.95 }}
             onClick={handleSend}
             disabled={!input.trim() || isLoading}
             className="shrink-0 rounded-xl p-2 transition-all disabled:opacity-30 gradient-primary glow-primary hover:opacity-90"
           >
             <Send className="h-4 w-4 text-primary-foreground" />
-          </button>
+          </motion.button>
         </div>
 
         <p className="mt-2 text-center text-xs text-muted-foreground">

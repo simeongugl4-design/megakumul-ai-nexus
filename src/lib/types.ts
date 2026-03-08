@@ -4,6 +4,14 @@ export type Message = {
   content: string;
   timestamp: Date;
   model?: string;
+  mode?: "answer" | "research";
+};
+
+export type FollowUpAction = {
+  label: string;
+  icon: string;
+  prefix: string;
+  mode: "answer" | "research";
 };
 
 export type AIModel = {
