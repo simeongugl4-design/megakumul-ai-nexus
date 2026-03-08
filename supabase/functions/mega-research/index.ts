@@ -32,7 +32,8 @@ IMPORTANT:
 - Make source titles descriptive and specific to the content
 - Include inline [n] citations naturally throughout the text
 - Be thorough, accurate, and detailed in your research response
-- Write at least 400 words for the main content`;
+- Write at least 400 words for the main content
+- For ALL mathematical expressions, equations, and formulas, use LaTeX notation wrapped in dollar signs: $inline math$ for inline and $$display math$$ for block equations. For example: $E = mc^2$, $\\int_a^b f(x)\\,dx$, $$\\frac{d}{dx}\\sin x = \\cos x$$. Always use proper LaTeX — never use plain text for math.`;
 
     const response = await fetch("https://ai.gateway.lovable.dev/v1/chat/completions", {
       method: "POST",
