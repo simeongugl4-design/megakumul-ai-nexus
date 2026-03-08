@@ -2,6 +2,8 @@ import { useRef, useEffect } from "react";
 import { motion, AnimatePresence } from "framer-motion";
 import ReactMarkdown from "react-markdown";
 import remarkGfm from "remark-gfm";
+import remarkMath from "remark-math";
+import rehypeKatex from "rehype-katex";
 import { Message } from "@/lib/types";
 import { Zap, ArrowRight, Search, Lightbulb, Code, ListChecks, RefreshCw, Copy, Check } from "lucide-react";
 import { useState } from "react";
