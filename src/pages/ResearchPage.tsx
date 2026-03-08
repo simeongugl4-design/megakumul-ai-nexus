@@ -289,53 +289,66 @@ export default function ResearchPage() {
                 )}
               </div>
 
-              {/* Sources sidebar */}
+              {/* Sources & Diagram sidebar */}
               <div className="lg:col-span-1">
-                <div className="sticky top-4">
-                  <div className="flex items-center justify-between mb-3">
-                    <h3 className="text-sm font-heading font-semibold text-foreground flex items-center gap-2">
-                      <Globe className="h-4 w-4 text-secondary" />
-                      Sources
-                      {sources.length > 0 && (
-                        <span className="rounded-full bg-secondary/20 px-2 py-0.5 text-[10px] text-secondary">
-                          {sources.length}
-                        </span>
-                      )}
-                    </h3>
+                <div className="sticky top-4 space-y-6">
+                  {/* Sources */}
+                  <div>
+                    <div className="flex items-center justify-between mb-3">
+                      <h3 className="text-sm font-heading font-semibold text-foreground flex items-center gap-2">
+                        <Globe className="h-4 w-4 text-secondary" />
+                        Sources
+                        {sources.length > 0 && (
+                          <span className="rounded-full bg-secondary/20 px-2 py-0.5 text-[10px] text-secondary">
+                            {sources.length}
+                          </span>
+                        )}
+                      </h3>
+                    </div>
+
+                    {sources.length > 0 ? (
+                      <div className="space-y-3">
+                        <AnimatePresence>
+                          {displayedSources.map((source, i) => (
+                            <SourceCard key={source.id} source={source} index={i} />
+                          ))}
+                        </AnimatePresence>
+
+                        {sources.length > 4 && (
+                          <button
+                            onClick={() => setShowAllSources(!showAllSources)}
+                            className="flex w-full items-center justify-center gap-1 rounded-lg border border-border py-2 text-xs text-muted-foreground transition-colors hover:bg-muted hover:text-foreground"
+                          >
+                            {showAllSources ? (
+                              <>Show less <ChevronUp className="h-3 w-3" /></>
+                            ) : (
+                              <>Show {sources.length - 4} more <ChevronDown className="h-3 w-3" /></>
+                            )}
+                          </button>
+                        )}
+                      </div>
+                    ) : isLoading ? (
+                      <div className="space-y-3">
+                        {[1, 2, 3].map((i) => (
+                          <div key={i} className="rounded-xl border border-border bg-muted/50 p-4 animate-pulse">
+                            <div className="h-3 w-20 bg-muted rounded mb-2" />
+                            <div className="h-4 w-full bg-muted rounded mb-1" />
+                            <div className="h-3 w-2/3 bg-muted rounded" />
+                          </div>
+                        ))}
+                      </div>
+                    ) : null}
                   </div>
 
-                  {sources.length > 0 ? (
-                    <div className="space-y-3">
-                      <AnimatePresence>
-                        {displayedSources.map((source, i) => (
-                          <SourceCard key={source.id} source={source} index={i} />
-                        ))}
-                      </AnimatePresence>
-
-                      {sources.length > 4 && (
-                        <button
-                          onClick={() => setShowAllSources(!showAllSources)}
-                          className="flex w-full items-center justify-center gap-1 rounded-lg border border-border py-2 text-xs text-muted-foreground transition-colors hover:bg-muted hover:text-foreground"
-                        >
-                          {showAllSources ? (
-                            <>Show less <ChevronUp className="h-3 w-3" /></>
-                          ) : (
-                            <>Show {sources.length - 4} more <ChevronDown className="h-3 w-3" /></>
-                          )}
-                        </button>
-                      )}
+                  {/* AI Diagram */}
+                  {isComplete && (
+                    <div>
+                      <h3 className="text-sm font-heading font-semibold text-foreground mb-3 flex items-center gap-2">
+                        <span className="text-secondary">📊</span> AI Diagram
+                      </h3>
+                      <DiagramPanel query={query} />
                     </div>
-                  ) : isLoading ? (
-                    <div className="space-y-3">
-                      {[1, 2, 3].map((i) => (
-                        <div key={i} className="rounded-xl border border-border bg-muted/50 p-4 animate-pulse">
-                          <div className="h-3 w-20 bg-muted rounded mb-2" />
-                          <div className="h-4 w-full bg-muted rounded mb-1" />
-                          <div className="h-3 w-2/3 bg-muted rounded" />
-                        </div>
-                      ))}
-                    </div>
-                  ) : null}
+                  )}
                 </div>
               </div>
             </div>
