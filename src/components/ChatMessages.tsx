@@ -7,6 +7,7 @@ import rehypeKatex from "rehype-katex";
 import { Message } from "@/lib/types";
 import { Zap, ArrowRight, Search, Lightbulb, Code, ListChecks, RefreshCw, Copy, Check } from "lucide-react";
 import { useState } from "react";
+import { preprocessLatex } from "@/lib/latex-utils";
 
 interface ChatMessagesProps {
   messages: Message[];
@@ -143,7 +144,7 @@ export function ChatMessages({ messages, isLoading, onSend }: ChatMessagesProps)
                     {msg.role === "assistant" ? (
                       <div className="prose prose-sm prose-invert max-w-none prose-headings:font-heading prose-code:text-primary prose-pre:bg-muted prose-pre:border prose-pre:border-border">
                         <ReactMarkdown remarkPlugins={[remarkGfm, remarkMath]} rehypePlugins={[rehypeKatex]}>
-                          {msg.content}
+                          {preprocessLatex(msg.content)}
                         </ReactMarkdown>
                       </div>
                     ) : (

@@ -8,6 +8,7 @@ import { Calculator, ArrowRight, Loader2, RotateCcw, Copy, Check } from "lucide-
 import { useMathSolver } from "@/hooks/use-math-solver";
 import { TopNav } from "@/components/TopNav";
 import { DiagramPanel } from "@/components/DiagramPanel";
+import { preprocessLatex } from "@/lib/latex-utils";
 
 const suggestions = [
   "Solve the integral ∫(x³ + 2x)dx from 0 to 3",
@@ -103,7 +104,7 @@ export default function MathSolverPage() {
                 <div className="rounded-2xl border border-border bg-card p-6">
                   {error ? <p className="text-destructive">⚠️ {error}</p> : (
                     <div className="prose prose-sm prose-invert max-w-none prose-headings:font-heading prose-headings:gradient-text prose-code:text-primary prose-pre:bg-muted prose-pre:border prose-pre:border-border">
-                      <ReactMarkdown remarkPlugins={[remarkGfm, remarkMath]} rehypePlugins={[rehypeKatex]}>{content}</ReactMarkdown>
+                      <ReactMarkdown remarkPlugins={[remarkGfm, remarkMath]} rehypePlugins={[rehypeKatex]}>{preprocessLatex(content)}</ReactMarkdown>
                     </div>
                   )}
                 </div>

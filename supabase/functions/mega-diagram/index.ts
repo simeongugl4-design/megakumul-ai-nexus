@@ -20,14 +20,13 @@ serve(async (req) => {
         "Content-Type": "application/json",
       },
       body: JSON.stringify({
-        model: "google/gemini-2.5-flash-image",
+        model: "google/gemini-3-pro-image-preview",
         messages: [
           {
             role: "user",
-            content: `Create a clear, professional, educational diagram or graph illustration for the following topic. Make it colorful, well-labeled with axis labels, titles, and annotations. Use a clean white background. Style it like a textbook illustration with clear mathematical notation: ${prompt}`,
+            content: `Create a clear, professional, educational diagram or graph illustration for the following topic. Make it colorful, well-labeled with axis labels, titles, and annotations. Use a clean white background. Style it like a textbook illustration with clear mathematical notation. DO NOT use dotted lines - use solid lines only: ${prompt}`,
           },
         ],
-        modalities: ["image", "text"],
       }),
     });
 
@@ -51,8 +50,48 @@ serve(async (req) => {
 
     const data = await response.json();
     const message = data.choices?.[0]?.message;
-    const imageUrl = message?.images?.[0]?.image_url?.url || null;
-    const text = message?.content || "";
+    
+    // Try multiple response formats for image extraction
+    let imageUrl: string | null = null;
+    let text = "";
+
+    // Format 1: images array (Lovable gateway format)
+    if (message?.images?.[0]?.image_url?.url) {
+      imageUrl = message.images[0].image_url.url;
+    }
+    
+    // Format 2: content as array of parts (OpenAI multimodal format)
+    if (!imageUrl && Array.isArray(message?.content)) {
+      for (const part of message.content) {
+        if (part.type === "image_url" && part.image_url?.url) {
+          imageUrl = part.image_url.url;
+        } else if (part.type === "text") {
+          text = part.text || "";
+        }
+      }
+    }
+    
+    // Format 3: inline_data with base64
+    if (!imageUrl && Array.isArray(message?.content)) {
+      for (const part of message.content) {
+        if (part.inline_data?.data) {
+          const mime = part.inline_data.mime_type || "image/png";
+          imageUrl = `data:${mime};base64,${part.inline_data.data}`;
+        }
+      }
+    }
+
+    // Text fallback
+    if (!text && typeof message?.content === "string") {
+      text = message.content;
+    }
+
+    if (!imageUrl) {
+      console.error("No image found in response:", JSON.stringify(data).slice(0, 500));
+      return new Response(JSON.stringify({ error: "No diagram was generated. Please try a different prompt." }), {
+        status: 422, headers: { ...corsHeaders, "Content-Type": "application/json" },
+      });
+    }
 
     return new Response(JSON.stringify({ imageUrl, text }), {
       headers: { ...corsHeaders, "Content-Type": "application/json" },
