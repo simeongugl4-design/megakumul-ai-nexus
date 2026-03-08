@@ -67,7 +67,7 @@ function SourceCard({ source, index }: { source: ResearchSource; index: number }
 function ResearchContent({ content }: { content: string }) {
   return (
     <div className="prose prose-sm prose-invert max-w-none prose-headings:font-heading prose-headings:gradient-text prose-code:text-primary prose-pre:bg-muted prose-pre:border prose-pre:border-border prose-a:text-primary prose-a:no-underline hover:prose-a:underline prose-strong:text-foreground">
-      <ReactMarkdown remarkPlugins={[remarkGfm]}>{content}</ReactMarkdown>
+      <ReactMarkdown remarkPlugins={[remarkGfm, remarkMath]} rehypePlugins={[rehypeKatex]}>{content}</ReactMarkdown>
     </div>
   );
 }
