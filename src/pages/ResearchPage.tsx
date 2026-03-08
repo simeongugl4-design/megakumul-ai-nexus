@@ -346,7 +346,7 @@ export default function ResearchPage() {
                       <h3 className="text-sm font-heading font-semibold text-foreground mb-3 flex items-center gap-2">
                         <span className="text-secondary">📊</span> AI Diagram
                       </h3>
-                      <DiagramPanel query={query} />
+                      <DiagramPanel query={query} autoGenerate />
                     </div>
                   )}
                 </div>
