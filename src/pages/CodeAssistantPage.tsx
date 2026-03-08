@@ -152,7 +152,7 @@ export default function CodeAssistantPage() {
                   <h3 className="text-sm font-heading font-semibold text-foreground mb-3 flex items-center gap-2">
                     <span className="text-[hsl(150,80%,50%)]">🎨</span> AI Diagram
                   </h3>
-                  <DiagramPanel query={lastQuery} />
+                  <DiagramPanel query={lastQuery} autoGenerate />
                 </div>
               </div>
             </div>
