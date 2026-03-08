@@ -2,3 +2,6 @@ project_id = "khwjrkficzshbcfnppfn"
 
 [functions.mega-chat]
 verify_jwt = false
+
+[functions.mega-research]
+verify_jwt = false
