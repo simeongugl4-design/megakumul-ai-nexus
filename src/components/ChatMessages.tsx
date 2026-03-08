@@ -7,6 +7,7 @@ import rehypeKatex from "rehype-katex";
 import { Message } from "@/lib/types";
 import { Zap, ArrowRight, Search, Lightbulb, Code, ListChecks, RefreshCw, Copy, Check } from "lucide-react";
 import { useState } from "react";
+import { preprocessLatex } from "@/lib/latex-utils";
 
 interface ChatMessagesProps {
   messages: Message[];
