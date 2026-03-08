@@ -1,6 +1,6 @@
 import { 
   LayoutDashboard, MessageSquare, Search, FileText, ImageIcon, 
-  Code, BookOpen, Star, Clock, Puzzle, Settings, ChevronLeft, ChevronRight, Zap
+  Code, BookOpen, Star, Clock, Puzzle, Settings, ChevronLeft, ChevronRight, Zap, Calculator
 } from "lucide-react";
 import { NavLink } from "@/components/NavLink";
 import { useSidebar } from "@/components/ui/sidebar";
@@ -23,6 +23,7 @@ const mainItems = [
   { title: "Documents", url: "/documents", icon: FileText },
   { title: "Image AI", url: "/image-ai", icon: ImageIcon },
   { title: "Code Assistant", url: "/code", icon: Code },
+  { title: "Math Solver", url: "/math", icon: Calculator },
 ];
 
 const secondaryItems = [
