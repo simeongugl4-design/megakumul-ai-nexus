@@ -17,3 +17,6 @@ verify_jwt = false
 
 [functions.mega-math]
 verify_jwt = false
+
+[functions.mega-diagram]
+verify_jwt = false
