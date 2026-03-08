@@ -7,6 +7,7 @@ import { SidebarProvider } from "@/components/ui/sidebar";
 import { AppSidebar } from "@/components/AppSidebar";
 import DashboardPage from "./pages/DashboardPage";
 import ChatPage from "./pages/ChatPage";
+import ResearchPage from "./pages/ResearchPage";
 import NotFound from "./pages/NotFound";
 
 const queryClient = new QueryClient();
