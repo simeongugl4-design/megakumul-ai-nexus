@@ -8,6 +8,7 @@ import { Calculator, ArrowRight, Loader2, RotateCcw, Copy, Check } from "lucide-
 import { useMathSolver } from "@/hooks/use-math-solver";
 import { TopNav } from "@/components/TopNav";
 import { DiagramPanel } from "@/components/DiagramPanel";
+import { preprocessLatex } from "@/lib/latex-utils";
 
 const suggestions = [
   "Solve the integral ∫(x³ + 2x)dx from 0 to 3",
