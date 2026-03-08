@@ -63,9 +63,9 @@ export function ChatInput({ onSend, isLoading, prefill, onPrefillUsed }: ChatInp
                 setInput(action.prefix);
                 textareaRef.current?.focus();
               }}
-              className="flex items-center gap-1.5 rounded-lg border border-border bg-muted px-3 py-1.5 text-xs text-muted-foreground transition-all hover:border-primary/50 hover:text-foreground"
+              className="flex items-center gap-1.5 rounded-lg border border-border bg-muted px-3 py-2 text-xs font-medium text-muted-foreground transition-all hover:border-primary/50 hover:text-foreground hover:bg-surface-elevated"
             >
-              <action.icon className="h-3 w-3" />
+              <action.icon className="h-3.5 w-3.5 text-primary" />
               {action.label}
             </motion.button>
           ))}
