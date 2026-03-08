@@ -134,7 +134,7 @@ export default function CodeAssistantPage() {
                     <p className="text-destructive">⚠️ {error}</p>
                   ) : (
                     <div className="prose prose-sm prose-invert max-w-none prose-headings:font-heading prose-code:text-[hsl(150,80%,50%)] prose-pre:bg-[hsl(230,15%,6%)] prose-pre:border prose-pre:border-border prose-pre:rounded-xl">
-                      <ReactMarkdown remarkPlugins={[remarkGfm, remarkMath]} rehypePlugins={[rehypeKatex]}>{content}</ReactMarkdown>
+                      <ReactMarkdown remarkPlugins={[remarkGfm, remarkMath]} rehypePlugins={[rehypeKatex]}>{preprocessLatex(content)}</ReactMarkdown>
                     </div>
                   )}
                 </div>
