@@ -7,6 +7,7 @@ import rehypeKatex from "rehype-katex";
 import { Calculator, ArrowRight, Loader2, RotateCcw, Copy, Check } from "lucide-react";
 import { useMathSolver } from "@/hooks/use-math-solver";
 import { TopNav } from "@/components/TopNav";
+import { DiagramPanel } from "@/components/DiagramPanel";
 
 const suggestions = [
   "Solve the integral ∫(x³ + 2x)dx from 0 to 3",
@@ -22,11 +23,13 @@ export default function MathSolverPage() {
   const [input, setInput] = useState("");
   const [selectedModel, setSelectedModel] = useState("expert");
   const [copied, setCopied] = useState(false);
+  const [lastQuery, setLastQuery] = useState("");
   const inputRef = useRef<HTMLTextAreaElement>(null);
 
   const handleSubmit = (e?: React.FormEvent) => {
     e?.preventDefault();
     if (!input.trim() || isLoading) return;
+    setLastQuery(input.trim());
     solve(input.trim());
   };
 
@@ -49,12 +52,12 @@ export default function MathSolverPage() {
             </motion.div>
             <motion.div initial={{ opacity: 0, y: 20 }} animate={{ opacity: 1, y: 0 }} transition={{ delay: 0.15 }} className="text-center mb-8">
               <h1 className="text-4xl font-heading font-bold gradient-text mb-3">Math Solver</h1>
-              <p className="max-w-lg text-muted-foreground">Step-by-step solutions with textbook-quality LaTeX rendering — calculus, algebra, linear algebra, and more</p>
+              <p className="max-w-lg text-muted-foreground">Step-by-step solutions with LaTeX rendering and AI-generated interactive diagrams</p>
             </motion.div>
 
             <motion.form initial={{ opacity: 0, y: 20 }} animate={{ opacity: 1, y: 0 }} transition={{ delay: 0.3 }} onSubmit={handleSubmit} className="w-full max-w-2xl mb-10">
               <div className="rounded-2xl border border-border bg-card p-3 focus-within:border-primary/50 focus-within:glow-primary">
-                <textarea ref={inputRef} value={input} onChange={(e) => setInput(e.target.value)} placeholder="Type a math problem... e.g. 'Solve ∫ x²sin(x) dx' or 'Find the determinant of [[1,2],[3,4]]'" rows={4} className="w-full bg-transparent text-sm text-foreground placeholder:text-muted-foreground focus:outline-none resize-none" onKeyDown={(e) => { if (e.key === "Enter" && (e.metaKey || e.ctrlKey)) handleSubmit(); }} />
+                <textarea ref={inputRef} value={input} onChange={(e) => setInput(e.target.value)} placeholder="Type a math problem... e.g. 'Solve ∫ x²sin(x) dx' or 'Graph the function y = x³ - 3x'" rows={4} className="w-full bg-transparent text-sm text-foreground placeholder:text-muted-foreground focus:outline-none resize-none" onKeyDown={(e) => { if (e.key === "Enter" && (e.metaKey || e.ctrlKey)) handleSubmit(); }} />
                 <div className="flex justify-between items-center mt-2">
                   <span className="text-[10px] text-muted-foreground">Ctrl+Enter to submit</span>
                   <button type="submit" disabled={!input.trim()} className="rounded-xl px-5 py-2 text-sm font-medium gradient-primary text-primary-foreground transition-all disabled:opacity-30 hover:opacity-90">
@@ -68,7 +71,7 @@ export default function MathSolverPage() {
               <p className="text-center text-sm text-muted-foreground mb-4 font-medium">Try a problem:</p>
               <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
                 {suggestions.map((s, i) => (
-                  <motion.button key={s} initial={{ opacity: 0, y: 10 }} animate={{ opacity: 1, y: 0 }} transition={{ delay: 0.5 + i * 0.07 }} whileHover={{ scale: 1.02 }} onClick={() => { setInput(s); solve(s); }} className="group flex items-start gap-3 rounded-xl border border-border bg-card p-3 text-left text-sm text-muted-foreground transition-all hover:border-primary/50 hover:text-foreground">
+                  <motion.button key={s} initial={{ opacity: 0, y: 10 }} animate={{ opacity: 1, y: 0 }} transition={{ delay: 0.5 + i * 0.07 }} whileHover={{ scale: 1.02 }} onClick={() => { setInput(s); setLastQuery(s); solve(s); }} className="group flex items-start gap-3 rounded-xl border border-border bg-card p-3 text-left text-sm text-muted-foreground transition-all hover:border-primary/50 hover:text-foreground">
                     <Calculator className="mt-0.5 h-3.5 w-3.5 shrink-0 text-primary opacity-60 group-hover:opacity-100" />
                     <span className="line-clamp-2">{s}</span>
                   </motion.button>
@@ -77,7 +80,7 @@ export default function MathSolverPage() {
             </motion.div>
           </div>
         ) : (
-          <div className="mx-auto max-w-4xl px-4 py-8">
+          <div className="mx-auto max-w-5xl px-4 py-8">
             <div className="flex items-center justify-between mb-6">
               <div className="flex items-center gap-2 text-sm">
                 <Calculator className="h-4 w-4 text-primary" />
@@ -88,26 +91,41 @@ export default function MathSolverPage() {
                 <button onClick={handleCopy} className="flex items-center gap-1.5 rounded-lg border border-border px-3 py-1.5 text-xs text-muted-foreground hover:bg-muted hover:text-foreground">
                   {copied ? <Check className="h-3 w-3 text-[hsl(150,80%,50%)]" /> : <Copy className="h-3 w-3" />} {copied ? "Copied" : "Copy"}
                 </button>
-                <button onClick={() => { clear(); setInput(""); }} className="flex items-center gap-1.5 rounded-lg border border-border px-3 py-1.5 text-xs text-muted-foreground hover:bg-muted hover:text-foreground">
+                <button onClick={() => { clear(); setInput(""); setLastQuery(""); }} className="flex items-center gap-1.5 rounded-lg border border-border px-3 py-1.5 text-xs text-muted-foreground hover:bg-muted hover:text-foreground">
                   <RotateCcw className="h-3 w-3" /> New Problem
                 </button>
               </div>
             </div>
 
-            <div className="rounded-2xl border border-border bg-card p-6">
-              {error ? <p className="text-destructive">⚠️ {error}</p> : (
-                <div className="prose prose-sm prose-invert max-w-none prose-headings:font-heading prose-headings:gradient-text prose-code:text-primary prose-pre:bg-muted prose-pre:border prose-pre:border-border">
-                  <ReactMarkdown remarkPlugins={[remarkGfm, remarkMath]} rehypePlugins={[rehypeKatex]}>{content}</ReactMarkdown>
+            <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
+              {/* Main solution */}
+              <div className="lg:col-span-2">
+                <div className="rounded-2xl border border-border bg-card p-6">
+                  {error ? <p className="text-destructive">⚠️ {error}</p> : (
+                    <div className="prose prose-sm prose-invert max-w-none prose-headings:font-heading prose-headings:gradient-text prose-code:text-primary prose-pre:bg-muted prose-pre:border prose-pre:border-border">
+                      <ReactMarkdown remarkPlugins={[remarkGfm, remarkMath]} rehypePlugins={[rehypeKatex]}>{content}</ReactMarkdown>
+                    </div>
+                  )}
                 </div>
-              )}
-            </div>
 
-            {!isLoading && (
-              <form onSubmit={handleSubmit} className="mt-4 flex items-center gap-2 rounded-xl border border-border bg-card p-2">
-                <textarea value={input} onChange={(e) => setInput(e.target.value)} placeholder="Ask a follow-up or type a new problem..." rows={1} className="flex-1 bg-transparent text-sm text-foreground placeholder:text-muted-foreground focus:outline-none resize-none" onKeyDown={(e) => { if (e.key === "Enter" && !e.shiftKey) { e.preventDefault(); handleSubmit(); } }} />
-                <button type="submit" disabled={!input.trim()} className="rounded-lg px-3 py-1.5 text-xs font-medium gradient-primary text-primary-foreground disabled:opacity-30">Solve</button>
-              </form>
-            )}
+                {!isLoading && (
+                  <form onSubmit={handleSubmit} className="mt-4 flex items-center gap-2 rounded-xl border border-border bg-card p-2">
+                    <textarea value={input} onChange={(e) => setInput(e.target.value)} placeholder="Ask a follow-up or new problem..." rows={1} className="flex-1 bg-transparent text-sm text-foreground placeholder:text-muted-foreground focus:outline-none resize-none" onKeyDown={(e) => { if (e.key === "Enter" && !e.shiftKey) { e.preventDefault(); handleSubmit(); } }} />
+                    <button type="submit" disabled={!input.trim()} className="rounded-lg px-3 py-1.5 text-xs font-medium gradient-primary text-primary-foreground disabled:opacity-30">Solve</button>
+                  </form>
+                )}
+              </div>
+
+              {/* Diagram panel */}
+              <div className="lg:col-span-1">
+                <div className="sticky top-4">
+                  <h3 className="text-sm font-heading font-semibold text-foreground mb-3 flex items-center gap-2">
+                    <span className="text-primary">📐</span> AI Diagram
+                  </h3>
+                  <DiagramPanel query={lastQuery} />
+                </div>
+              </div>
+            </div>
           </div>
         )}
       </div>
