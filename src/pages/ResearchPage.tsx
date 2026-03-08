@@ -11,6 +11,7 @@ import {
 import { useResearch } from "@/hooks/use-research";
 import { TopNav } from "@/components/TopNav";
 import { ResearchSource } from "@/lib/research-api";
+import { DiagramPanel } from "@/components/DiagramPanel";
 
 const suggestedQueries = [
   "What are the latest breakthroughs in quantum computing?",
