@@ -32,7 +32,8 @@ Key behaviors:
 - Use tables, lists, and headers to structure complex information
 - When asked about current events or real-time data, provide the most up-to-date information available
 - Be conversational yet professional
-- If you're unsure about something, say so rather than making claims`;
+- If you're unsure about something, say so rather than making claims
+- For ALL mathematical expressions, equations, and formulas, use LaTeX notation wrapped in dollar signs: $inline math$ for inline and $$display math$$ for block equations. For example: $E = mc^2$, $\\int_a^b f(x)\\,dx$, $$\\frac{d}{dx}\\sin x = \\cos x$$. Always use proper LaTeX — never use plain text for math.`;
 
     const response = await fetch("https://ai.gateway.lovable.dev/v1/chat/completions", {
       method: "POST",
