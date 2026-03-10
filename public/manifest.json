@@ -1,0 +1,17 @@
+{
+  "name": "MegaKUMUL — AI Intelligence Platform",
+  "short_name": "MegaKUMUL",
+  "description": "Next-gen AI platform combining conversational intelligence, real-time research, code generation, and document intelligence.",
+  "start_url": "/",
+  "display": "standalone",
+  "background_color": "#0a0a0f",
+  "theme_color": "#0a0a0f",
+  "icons": [
+    {
+      "src": "/logo.png",
+      "sizes": "512x512",
+      "type": "image/png",
+      "purpose": "any maskable"
+    }
+  ]
+}
