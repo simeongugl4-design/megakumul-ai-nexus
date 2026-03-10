@@ -3,13 +3,12 @@ import { Canvas, useFrame, useLoader } from "@react-three/fiber";
 import { OrbitControls, PerspectiveCamera } from "@react-three/drei";
 import * as THREE from "three";
 import { motion } from "framer-motion";
-import { RotateCcw, ZoomIn, ZoomOut, Maximize2 } from "lucide-react";
+import { RotateCcw, ZoomIn, ZoomOut, Maximize2, Download } from "lucide-react";
 
 function ImagePlane({ imageUrl }: { imageUrl: string }) {
   const meshRef = useRef<THREE.Mesh>(null);
   const texture = useLoader(THREE.TextureLoader, imageUrl);
 
-  // Calculate aspect ratio from texture
   const aspect = texture.image
     ? texture.image.width / texture.image.height
     : 16 / 9;
@@ -49,7 +48,9 @@ interface Interactive3DViewerProps {
 
 export function Interactive3DViewer({ imageUrl, title }: Interactive3DViewerProps) {
   const [isFullscreen, setIsFullscreen] = useState(false);
+  const [zoomLevel, setZoomLevel] = useState(5);
   const containerRef = useRef<HTMLDivElement>(null);
+  const controlsRef = useRef<any>(null);
 
   const toggleFullscreen = () => {
     if (!isFullscreen && containerRef.current) {
@@ -58,6 +59,23 @@ export function Interactive3DViewer({ imageUrl, title }: Interactive3DViewerProp
       document.exitFullscreen?.();
     }
     setIsFullscreen(!isFullscreen);
+  };
+
+  const handleZoomIn = () => {
+    setZoomLevel(z => Math.max(2, z - 1));
+  };
+
+  const handleZoomOut = () => {
+    setZoomLevel(z => Math.min(15, z + 1));
+  };
+
+  const handleDownload = () => {
+    const a = document.createElement("a");
+    a.href = imageUrl;
+    a.download = `megakumul-diagram-${Date.now()}.png`;
+    document.body.appendChild(a);
+    a.click();
+    document.body.removeChild(a);
   };
 
   return (
@@ -71,26 +89,32 @@ export function Interactive3DViewer({ imageUrl, title }: Interactive3DViewerProp
       <div className="flex items-center justify-between px-4 py-2 border-b border-border bg-muted/50">
         <div className="flex items-center gap-2">
           <div className="h-2 w-2 rounded-full bg-[hsl(150,80%,50%)] animate-pulse" />
-          <span className="text-xs font-medium text-muted-foreground">
-            {title || "3D Interactive Diagram"} — Drag to rotate, scroll to zoom
+          <span className="text-xs font-medium text-muted-foreground truncate max-w-[200px]">
+            {title || "3D Interactive Diagram"}
           </span>
         </div>
         <div className="flex items-center gap-1">
-          <button
-            onClick={toggleFullscreen}
-            className="rounded-md p-1 text-muted-foreground hover:bg-muted hover:text-foreground transition-colors"
-            title="Toggle fullscreen"
-          >
-            <Maximize2 className="h-3.5 w-3.5" />
+          <button onClick={handleZoomIn} className="rounded-md p-1.5 text-muted-foreground hover:bg-muted hover:text-foreground transition-colors" title="Zoom in">
+            <ZoomIn className="h-4 w-4" />
+          </button>
+          <button onClick={handleZoomOut} className="rounded-md p-1.5 text-muted-foreground hover:bg-muted hover:text-foreground transition-colors" title="Zoom out">
+            <ZoomOut className="h-4 w-4" />
+          </button>
+          <button onClick={handleDownload} className="rounded-md p-1.5 text-muted-foreground hover:bg-muted hover:text-foreground transition-colors" title="Download">
+            <Download className="h-4 w-4" />
+          </button>
+          <button onClick={toggleFullscreen} className="rounded-md p-1.5 text-muted-foreground hover:bg-muted hover:text-foreground transition-colors" title="Toggle fullscreen">
+            <Maximize2 className="h-4 w-4" />
           </button>
         </div>
       </div>
 
       {/* 3D Canvas */}
       <div className="h-[400px] w-full bg-gradient-to-b from-[hsl(230,15%,8%)] to-[hsl(230,15%,5%)]">
-        <Canvas>
-          <PerspectiveCamera makeDefault position={[0, 0, 5]} />
+        <Canvas key={zoomLevel}>
+          <PerspectiveCamera makeDefault position={[0, 0, zoomLevel]} />
           <OrbitControls
+            ref={controlsRef}
             enablePan={true}
             enableZoom={true}
             enableRotate={true}
@@ -104,7 +128,6 @@ export function Interactive3DViewer({ imageUrl, title }: Interactive3DViewerProp
           <Suspense fallback={<LoadingPlane />}>
             <ImagePlane imageUrl={imageUrl} />
           </Suspense>
-          {/* Grid helper for 3D context */}
           <gridHelper args={[10, 10, "hsl(230, 15%, 20%)", "hsl(230, 15%, 12%)"]} position={[0, -2, 0]} />
         </Canvas>
       </div>
@@ -112,13 +135,13 @@ export function Interactive3DViewer({ imageUrl, title }: Interactive3DViewerProp
       {/* Controls hint */}
       <div className="flex items-center justify-center gap-6 px-4 py-2 border-t border-border bg-muted/30">
         <span className="flex items-center gap-1.5 text-[10px] text-muted-foreground">
-          <RotateCcw className="h-3 w-3" /> Left-click drag to rotate
+          <RotateCcw className="h-3 w-3" /> Drag to rotate
         </span>
         <span className="flex items-center gap-1.5 text-[10px] text-muted-foreground">
           <ZoomIn className="h-3 w-3" /> Scroll to zoom
         </span>
         <span className="flex items-center gap-1.5 text-[10px] text-muted-foreground">
-          <ZoomOut className="h-3 w-3" /> Right-click drag to pan
+          <ZoomOut className="h-3 w-3" /> Right-click to pan
         </span>
       </div>
     </motion.div>

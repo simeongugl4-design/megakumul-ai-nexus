@@ -4,7 +4,7 @@ import ReactMarkdown from "react-markdown";
 import remarkGfm from "remark-gfm";
 import remarkMath from "remark-math";
 import rehypeKatex from "rehype-katex";
-import { Calculator, ArrowRight, Loader2, RotateCcw, Copy, Check } from "lucide-react";
+import { Calculator, ArrowRight, Loader2, RotateCcw, Copy, Check, Upload, Camera, FileText } from "lucide-react";
 import { useMathSolver } from "@/hooks/use-math-solver";
 import { TopNav } from "@/components/TopNav";
 import { DiagramPanel } from "@/components/DiagramPanel";
@@ -26,6 +26,8 @@ export default function MathSolverPage() {
   const [copied, setCopied] = useState(false);
   const [lastQuery, setLastQuery] = useState("");
   const inputRef = useRef<HTMLTextAreaElement>(null);
+  const fileRef = useRef<HTMLInputElement>(null);
+  const imageRef = useRef<HTMLInputElement>(null);
 
   const handleSubmit = (e?: React.FormEvent) => {
     e?.preventDefault();
@@ -38,6 +40,30 @@ export default function MathSolverPage() {
     await navigator.clipboard.writeText(content);
     setCopied(true);
     setTimeout(() => setCopied(false), 2000);
+  };
+
+  const handleFileUpload = async (e: React.ChangeEvent<HTMLInputElement>) => {
+    const file = e.target.files?.[0];
+    if (!file) return;
+
+    if (file.type.startsWith("image/")) {
+      // For images, describe and ask to solve
+      const prompt = `I uploaded an image of a math problem. The filename is "${file.name}". Please solve it step by step. (Note: Image analysis is being processed)`;
+      setInput(prompt);
+      setLastQuery(prompt);
+      solve(prompt);
+    } else {
+      // For PDF/text files
+      try {
+        const text = await file.text();
+        const prompt = `Solve the following math problem from the uploaded document:\n\n${text.slice(0, 3000)}`;
+        setInput(prompt);
+        setLastQuery(prompt);
+        solve(prompt);
+      } catch {
+        setInput(`Please solve the math problems in the file "${file.name}"`);
+      }
+    }
   };
 
   const hasResults = content.length > 0 || isLoading;
@@ -54,6 +80,21 @@ export default function MathSolverPage() {
             <motion.div initial={{ opacity: 0, y: 20 }} animate={{ opacity: 1, y: 0 }} transition={{ delay: 0.15 }} className="text-center mb-8">
               <h1 className="text-4xl font-heading font-bold gradient-text mb-3">Math Solver</h1>
               <p className="max-w-lg text-muted-foreground">Step-by-step solutions with LaTeX rendering and AI-generated interactive diagrams</p>
+            </motion.div>
+
+            {/* Upload options */}
+            <motion.div initial={{ opacity: 0, y: 20 }} animate={{ opacity: 1, y: 0 }} transition={{ delay: 0.25 }} className="flex flex-wrap justify-center gap-3 mb-6">
+              <input ref={fileRef} type="file" accept=".pdf,.txt,.md,.tex" onChange={handleFileUpload} className="hidden" />
+              <input ref={imageRef} type="file" accept="image/*" onChange={handleFileUpload} className="hidden" />
+              <button onClick={() => fileRef.current?.click()} className="flex items-center gap-2 rounded-xl border border-border px-4 py-2.5 text-sm text-muted-foreground hover:text-foreground hover:border-primary/30 transition-all">
+                <FileText className="h-4 w-4 text-primary" /> Upload PDF
+              </button>
+              <button onClick={() => imageRef.current?.click()} className="flex items-center gap-2 rounded-xl border border-border px-4 py-2.5 text-sm text-muted-foreground hover:text-foreground hover:border-primary/30 transition-all">
+                <Upload className="h-4 w-4 text-primary" /> Upload Image
+              </button>
+              <button onClick={() => imageRef.current?.click()} className="flex items-center gap-2 rounded-xl border border-border px-4 py-2.5 text-sm text-muted-foreground hover:text-foreground hover:border-primary/30 transition-all">
+                <Camera className="h-4 w-4 text-primary" /> Scan to Solve
+              </button>
             </motion.div>
 
             <motion.form initial={{ opacity: 0, y: 20 }} animate={{ opacity: 1, y: 0 }} transition={{ delay: 0.3 }} onSubmit={handleSubmit} className="w-full max-w-2xl mb-10">
@@ -98,35 +139,31 @@ export default function MathSolverPage() {
               </div>
             </div>
 
-            <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
-              {/* Main solution */}
-              <div className="lg:col-span-2">
-                <div className="rounded-2xl border border-border bg-card p-6">
-                  {error ? <p className="text-destructive">⚠️ {error}</p> : (
-                    <div className="prose prose-sm prose-invert max-w-none prose-headings:font-heading prose-headings:gradient-text prose-code:text-primary prose-pre:bg-muted prose-pre:border prose-pre:border-border">
-                      <ReactMarkdown remarkPlugins={[remarkGfm, remarkMath]} rehypePlugins={[rehypeKatex]}>{preprocessLatex(content)}</ReactMarkdown>
-                    </div>
-                  )}
+            {/* Main solution - full width */}
+            <div className="rounded-2xl border border-border bg-card p-6 mb-6">
+              {error ? <p className="text-destructive">⚠️ {error}</p> : (
+                <div className="prose prose-sm prose-invert max-w-none prose-headings:font-heading prose-headings:gradient-text prose-code:text-primary prose-pre:bg-muted prose-pre:border prose-pre:border-border">
+                  <ReactMarkdown remarkPlugins={[remarkGfm, remarkMath]} rehypePlugins={[rehypeKatex]}>{preprocessLatex(content)}</ReactMarkdown>
                 </div>
-
-                {!isLoading && (
-                  <form onSubmit={handleSubmit} className="mt-4 flex items-center gap-2 rounded-xl border border-border bg-card p-2">
-                    <textarea value={input} onChange={(e) => setInput(e.target.value)} placeholder="Ask a follow-up or new problem..." rows={1} className="flex-1 bg-transparent text-sm text-foreground placeholder:text-muted-foreground focus:outline-none resize-none" onKeyDown={(e) => { if (e.key === "Enter" && !e.shiftKey) { e.preventDefault(); handleSubmit(); } }} />
-                    <button type="submit" disabled={!input.trim()} className="rounded-lg px-3 py-1.5 text-xs font-medium gradient-primary text-primary-foreground disabled:opacity-30">Solve</button>
-                  </form>
-                )}
-              </div>
-
-              {/* Diagram panel */}
-              <div className="lg:col-span-1">
-                <div className="sticky top-4">
-                  <h3 className="text-sm font-heading font-semibold text-foreground mb-3 flex items-center gap-2">
-                    <span className="text-primary">📐</span> AI Diagram
-                  </h3>
-                  <DiagramPanel query={lastQuery} autoGenerate />
-                </div>
-              </div>
+              )}
             </div>
+
+            {/* Diagram BELOW the answer */}
+            {lastQuery && !isLoading && content && (
+              <div className="mb-6">
+                <h3 className="text-sm font-heading font-semibold text-foreground mb-3 flex items-center gap-2">
+                  <span className="text-primary">📐</span> AI Diagram
+                </h3>
+                <DiagramPanel query={lastQuery} autoGenerate />
+              </div>
+            )}
+
+            {!isLoading && (
+              <form onSubmit={handleSubmit} className="flex items-center gap-2 rounded-xl border border-border bg-card p-2">
+                <textarea value={input} onChange={(e) => setInput(e.target.value)} placeholder="Ask a follow-up or new problem..." rows={1} className="flex-1 bg-transparent text-sm text-foreground placeholder:text-muted-foreground focus:outline-none resize-none" onKeyDown={(e) => { if (e.key === "Enter" && !e.shiftKey) { e.preventDefault(); handleSubmit(); } }} />
+                <button type="submit" disabled={!input.trim()} className="rounded-lg px-3 py-1.5 text-xs font-medium gradient-primary text-primary-foreground disabled:opacity-30">Solve</button>
+              </form>
+            )}
           </div>
         )}
       </div>

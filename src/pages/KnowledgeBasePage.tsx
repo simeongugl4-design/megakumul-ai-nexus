@@ -1,39 +1,60 @@
-import { useState } from "react";
-import { motion } from "framer-motion";
-import { BookOpen, Plus, Search, Trash2, ExternalLink, Tag } from "lucide-react";
+import { useState, useEffect } from "react";
+import { motion, AnimatePresence } from "framer-motion";
+import { BookOpen, Plus, Search, Trash2, Tag, GraduationCap, X } from "lucide-react";
 import { TopNav } from "@/components/TopNav";
+import { useNavigate } from "react-router-dom";
 
 type KBEntry = {
   id: string;
   title: string;
-  content: string;
+  type: "course" | "topic" | "custom";
   tags: string[];
   createdAt: Date;
 };
 
+const STORAGE_KEY = "megakumul-knowledge-base";
+
+function loadEntries(): KBEntry[] {
+  try {
+    const raw = localStorage.getItem(STORAGE_KEY);
+    if (!raw) return [];
+    return JSON.parse(raw).map((e: any) => ({ ...e, createdAt: new Date(e.createdAt) }));
+  } catch {
+    return [];
+  }
+}
+
+function saveEntries(entries: KBEntry[]) {
+  localStorage.setItem(STORAGE_KEY, JSON.stringify(entries));
+}
+
 export default function KnowledgeBasePage() {
-  const [entries, setEntries] = useState<KBEntry[]>([]);
+  const [entries, setEntries] = useState<KBEntry[]>(loadEntries);
   const [search, setSearch] = useState("");
   const [showAdd, setShowAdd] = useState(false);
   const [newTitle, setNewTitle] = useState("");
-  const [newContent, setNewContent] = useState("");
+  const [newType, setNewType] = useState<"course" | "topic" | "custom">("course");
   const [newTags, setNewTags] = useState("");
   const [selectedModel, setSelectedModel] = useState("expert");
+  const navigate = useNavigate();
+
+  useEffect(() => {
+    saveEntries(entries);
+  }, [entries]);
 
   const addEntry = () => {
-    if (!newTitle.trim() || !newContent.trim()) return;
+    if (!newTitle.trim()) return;
     setEntries((prev) => [
       {
         id: crypto.randomUUID(),
         title: newTitle.trim(),
-        content: newContent.trim(),
+        type: newType,
         tags: newTags.split(",").map((t) => t.trim()).filter(Boolean),
         createdAt: new Date(),
       },
       ...prev,
     ]);
     setNewTitle("");
-    setNewContent("");
     setNewTags("");
     setShowAdd(false);
   };
@@ -43,9 +64,12 @@ export default function KnowledgeBasePage() {
   const filtered = entries.filter(
     (e) =>
       e.title.toLowerCase().includes(search.toLowerCase()) ||
-      e.content.toLowerCase().includes(search.toLowerCase()) ||
       e.tags.some((t) => t.toLowerCase().includes(search.toLowerCase()))
   );
+
+  const handleResearch = (title: string) => {
+    navigate(`/research?q=${encodeURIComponent(title)}`);
+  };
 
   return (
     <div className="flex h-screen flex-col">
@@ -55,59 +79,99 @@ export default function KnowledgeBasePage() {
           <div className="flex items-center justify-between mb-6">
             <div>
               <h1 className="text-2xl font-heading font-bold gradient-text">Knowledge Base</h1>
-              <p className="text-sm text-muted-foreground">Save and organize your knowledge snippets</p>
+              <p className="text-sm text-muted-foreground">Add courses & topics to study, then research them with AI</p>
             </div>
             <motion.button whileHover={{ scale: 1.05 }} whileTap={{ scale: 0.95 }} onClick={() => setShowAdd(!showAdd)} className="flex items-center gap-2 rounded-xl px-4 py-2 text-sm font-medium gradient-primary text-primary-foreground">
-              <Plus className="h-4 w-4" /> Add Entry
+              <Plus className="h-4 w-4" /> Add Course/Topic
             </motion.button>
           </div>
 
           {/* Search */}
           <div className="flex items-center gap-2 rounded-xl border border-border bg-card p-2 mb-6">
             <Search className="ml-2 h-4 w-4 text-muted-foreground" />
-            <input value={search} onChange={(e) => setSearch(e.target.value)} placeholder="Search knowledge base..." className="flex-1 bg-transparent text-sm text-foreground placeholder:text-muted-foreground focus:outline-none" />
+            <input value={search} onChange={(e) => setSearch(e.target.value)} placeholder="Search your knowledge base..." className="flex-1 bg-transparent text-sm text-foreground placeholder:text-muted-foreground focus:outline-none" />
+            {search && (
+              <button onClick={() => setSearch("")} className="p-1 text-muted-foreground hover:text-foreground">
+                <X className="h-3.5 w-3.5" />
+              </button>
+            )}
           </div>
 
           {/* Add form */}
-          {showAdd && (
-            <motion.div initial={{ opacity: 0, y: -10 }} animate={{ opacity: 1, y: 0 }} className="mb-6 rounded-2xl border border-primary/30 bg-card p-4 space-y-3">
-              <input value={newTitle} onChange={(e) => setNewTitle(e.target.value)} placeholder="Title" className="w-full rounded-lg border border-border bg-muted px-3 py-2 text-sm text-foreground placeholder:text-muted-foreground focus:outline-none" />
-              <textarea value={newContent} onChange={(e) => setNewContent(e.target.value)} placeholder="Content..." rows={4} className="w-full rounded-lg border border-border bg-muted px-3 py-2 text-sm text-foreground placeholder:text-muted-foreground focus:outline-none resize-none" />
-              <input value={newTags} onChange={(e) => setNewTags(e.target.value)} placeholder="Tags (comma-separated)" className="w-full rounded-lg border border-border bg-muted px-3 py-2 text-sm text-foreground placeholder:text-muted-foreground focus:outline-none" />
-              <div className="flex gap-2 justify-end">
-                <button onClick={() => setShowAdd(false)} className="px-4 py-2 text-xs rounded-lg border border-border text-muted-foreground hover:bg-muted">Cancel</button>
-                <button onClick={addEntry} disabled={!newTitle.trim() || !newContent.trim()} className="px-4 py-2 text-xs rounded-lg gradient-primary text-primary-foreground disabled:opacity-30">Save</button>
-              </div>
-            </motion.div>
-          )}
+          <AnimatePresence>
+            {showAdd && (
+              <motion.div initial={{ opacity: 0, height: 0 }} animate={{ opacity: 1, height: "auto" }} exit={{ opacity: 0, height: 0 }} className="mb-6 overflow-hidden">
+                <div className="rounded-2xl border border-primary/30 bg-card p-4 space-y-3">
+                  <input value={newTitle} onChange={(e) => setNewTitle(e.target.value)} placeholder="Enter course name or topic to study..." className="w-full rounded-lg border border-border bg-muted px-3 py-2.5 text-sm text-foreground placeholder:text-muted-foreground focus:outline-none focus:border-primary/50" autoFocus onKeyDown={(e) => { if (e.key === "Enter") addEntry(); }} />
+                  <div className="flex gap-2">
+                    {(["course", "topic", "custom"] as const).map((t) => (
+                      <button key={t} onClick={() => setNewType(t)} className={`rounded-lg border px-3 py-1.5 text-xs font-medium transition-all capitalize ${newType === t ? "border-primary bg-primary/10 text-primary" : "border-border text-muted-foreground hover:text-foreground"}`}>
+                        {t}
+                      </button>
+                    ))}
+                  </div>
+                  <input value={newTags} onChange={(e) => setNewTags(e.target.value)} placeholder="Tags (comma-separated, e.g. math, science, programming)" className="w-full rounded-lg border border-border bg-muted px-3 py-2 text-sm text-foreground placeholder:text-muted-foreground focus:outline-none" />
+                  <div className="flex gap-2 justify-end">
+                    <button onClick={() => setShowAdd(false)} className="px-4 py-2 text-xs rounded-lg border border-border text-muted-foreground hover:bg-muted">Cancel</button>
+                    <button onClick={addEntry} disabled={!newTitle.trim()} className="px-4 py-2 text-xs rounded-lg gradient-primary text-primary-foreground disabled:opacity-30">Save</button>
+                  </div>
+                </div>
+              </motion.div>
+            )}
+          </AnimatePresence>
 
           {/* Entries */}
           {filtered.length === 0 ? (
             <div className="text-center py-16">
-              <BookOpen className="mx-auto h-12 w-12 text-muted-foreground/30 mb-4" />
-              <p className="text-muted-foreground">{entries.length === 0 ? "No entries yet. Add your first knowledge snippet!" : "No matching entries found."}</p>
+              <GraduationCap className="mx-auto h-12 w-12 text-muted-foreground/30 mb-4" />
+              <p className="text-muted-foreground mb-2">{entries.length === 0 ? "No courses or topics yet." : "No matching entries found."}</p>
+              <p className="text-xs text-muted-foreground/60">Add a course or topic to start studying with AI</p>
             </div>
           ) : (
             <div className="space-y-3">
-              {filtered.map((entry, i) => (
-                <motion.div key={entry.id} initial={{ opacity: 0, y: 10 }} animate={{ opacity: 1, y: 0 }} transition={{ delay: i * 0.05 }} className="rounded-xl border border-border bg-card p-4 group">
-                  <div className="flex items-start justify-between mb-2">
-                    <h3 className="font-heading font-semibold text-foreground">{entry.title}</h3>
-                    <button onClick={() => deleteEntry(entry.id)} className="opacity-0 group-hover:opacity-100 text-muted-foreground hover:text-destructive transition-all">
-                      <Trash2 className="h-4 w-4" />
-                    </button>
-                  </div>
-                  <p className="text-sm text-muted-foreground mb-3 line-clamp-3">{entry.content}</p>
-                  <div className="flex items-center gap-2 flex-wrap">
-                    {entry.tags.map((tag) => (
-                      <span key={tag} className="flex items-center gap-1 rounded-full bg-primary/10 px-2 py-0.5 text-[10px] text-primary">
-                        <Tag className="h-2.5 w-2.5" /> {tag}
-                      </span>
-                    ))}
-                    <span className="text-[10px] text-muted-foreground ml-auto">{entry.createdAt.toLocaleDateString()}</span>
-                  </div>
-                </motion.div>
-              ))}
+              <AnimatePresence>
+                {filtered.map((entry, i) => (
+                  <motion.div
+                    key={entry.id}
+                    initial={{ opacity: 0, y: 10 }}
+                    animate={{ opacity: 1, y: 0 }}
+                    exit={{ opacity: 0, x: -100 }}
+                    transition={{ delay: i * 0.05 }}
+                    className="rounded-xl border border-border bg-card p-4 group"
+                  >
+                    <div className="flex items-start justify-between mb-2">
+                      <div className="flex items-center gap-2">
+                        <GraduationCap className="h-4 w-4 text-primary shrink-0" />
+                        <h3 className="font-heading font-semibold text-foreground">{entry.title}</h3>
+                        <span className={`rounded-full px-2 py-0.5 text-[10px] font-medium capitalize ${
+                          entry.type === "course" ? "bg-primary/10 text-primary" :
+                          entry.type === "topic" ? "bg-secondary/10 text-secondary" :
+                          "bg-muted text-muted-foreground"
+                        }`}>{entry.type}</span>
+                      </div>
+                      <button onClick={() => deleteEntry(entry.id)} className="opacity-0 group-hover:opacity-100 text-muted-foreground hover:text-destructive transition-all p-1" title="Delete">
+                        <Trash2 className="h-4 w-4" />
+                      </button>
+                    </div>
+                    <div className="flex items-center gap-2 flex-wrap mb-3">
+                      {entry.tags.map((tag) => (
+                        <span key={tag} className="flex items-center gap-1 rounded-full bg-primary/10 px-2 py-0.5 text-[10px] text-primary">
+                          <Tag className="h-2.5 w-2.5" /> {tag}
+                        </span>
+                      ))}
+                      <span className="text-[10px] text-muted-foreground ml-auto">{entry.createdAt.toLocaleDateString()}</span>
+                    </div>
+                    <motion.button
+                      whileHover={{ scale: 1.02 }}
+                      whileTap={{ scale: 0.98 }}
+                      onClick={() => handleResearch(entry.title)}
+                      className="flex items-center gap-2 rounded-lg border border-secondary/30 bg-secondary/5 px-3 py-1.5 text-xs font-medium text-secondary hover:bg-secondary/10 transition-all"
+                    >
+                      <Search className="h-3 w-3" /> Research this with AI
+                    </motion.button>
+                  </motion.div>
+                ))}
+              </AnimatePresence>
             </div>
           )}
         </div>
