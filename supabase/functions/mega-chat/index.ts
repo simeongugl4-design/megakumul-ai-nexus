@@ -13,15 +13,7 @@ serve(async (req) => {
     const LOVABLE_API_KEY = Deno.env.get("LOVABLE_API_KEY");
     if (!LOVABLE_API_KEY) throw new Error("LOVABLE_API_KEY is not configured");
 
-    const modelMap: Record<string, string> = {
-      "fast": "google/gemini-2.5-flash-lite",
-      "research": "google/gemini-2.5-pro",
-      "creative": "google/gemini-3-flash-preview",
-      "coding": "google/gemini-3-flash-preview",
-      "expert": "google/gemini-2.5-pro",
-    };
-
-    const selectedModel = modelMap[model] || "google/gemini-3-flash-preview";
+    const selectedModel = "google/gemini-2.5-flash-lite";
 
     const systemPrompt = `You are MegaKUMUL, an advanced AI research and intelligence assistant. You provide accurate, comprehensive, and well-structured answers.
 

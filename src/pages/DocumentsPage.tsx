@@ -103,6 +103,23 @@ export default function DocumentsPage() {
                 </div>
               )}
             </div>
+            {!isLoading && content && (
+              <div className="mt-4 mb-2">
+                <p className="text-xs font-medium text-muted-foreground mb-2">Explore further:</p>
+                <div className="flex flex-wrap gap-2">
+                  {[
+                    "Summarize the key points",
+                    "Extract all important data into a table",
+                    "What are the main conclusions?",
+                    "Generate study notes from this",
+                  ].map((s, i) => (
+                    <button key={i} onClick={() => { setInput(s); query(s, docContent || undefined); }} className="rounded-lg border border-border px-3 py-1.5 text-xs text-muted-foreground hover:border-[hsl(30,90%,55%)]/50 hover:text-foreground transition-all">
+                      {s}
+                    </button>
+                  ))}
+                </div>
+              </div>
+            )}
             {!isLoading && (
               <form onSubmit={handleSubmit} className="mt-4 flex items-center gap-2 rounded-xl border border-border bg-card p-2">
                 <textarea value={input} onChange={(e) => setInput(e.target.value)} placeholder="Ask a follow-up..." rows={1} className="flex-1 bg-transparent text-sm text-foreground placeholder:text-muted-foreground focus:outline-none resize-none" onKeyDown={(e) => { if (e.key === "Enter" && !e.shiftKey) { e.preventDefault(); handleSubmit(); } }} />

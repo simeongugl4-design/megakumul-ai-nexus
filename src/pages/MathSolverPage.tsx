@@ -158,6 +158,32 @@ export default function MathSolverPage() {
               </div>
             )}
 
+            {/* Follow-up suggestions */}
+            {lastQuery && !isLoading && content && (
+              <div className="mb-4">
+                <p className="text-xs font-medium text-muted-foreground mb-3">Explore further:</p>
+                <div className="flex flex-wrap gap-2">
+                  {[
+                    `Graph the function from: ${lastQuery.slice(0, 40)}`,
+                    `Explain the concept behind this problem`,
+                    `Give me a similar practice problem`,
+                    `What are real-world applications of this?`,
+                  ].map((suggestion, i) => (
+                    <motion.button
+                      key={i}
+                      whileHover={{ scale: 1.02 }}
+                      whileTap={{ scale: 0.98 }}
+                      onClick={() => { setInput(suggestion); setLastQuery(suggestion); solve(suggestion); }}
+                      className="flex items-center gap-1.5 rounded-xl border border-border px-3 py-2 text-xs text-muted-foreground hover:border-primary/50 hover:text-foreground hover:bg-primary/5 transition-all"
+                    >
+                      <Calculator className="h-3 w-3 text-primary" />
+                      <span className="line-clamp-1 max-w-[200px]">{suggestion}</span>
+                    </motion.button>
+                  ))}
+                </div>
+              </div>
+            )}
+
             {!isLoading && (
               <form onSubmit={handleSubmit} className="flex items-center gap-2 rounded-xl border border-border bg-card p-2">
                 <textarea value={input} onChange={(e) => setInput(e.target.value)} placeholder="Ask a follow-up or new problem..." rows={1} className="flex-1 bg-transparent text-sm text-foreground placeholder:text-muted-foreground focus:outline-none resize-none" onKeyDown={(e) => { if (e.key === "Enter" && !e.shiftKey) { e.preventDefault(); handleSubmit(); } }} />

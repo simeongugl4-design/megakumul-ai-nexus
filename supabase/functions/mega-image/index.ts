@@ -22,7 +22,7 @@ serve(async (req) => {
           "Content-Type": "application/json",
         },
         body: JSON.stringify({
-          model: "google/gemini-3-flash-preview",
+          model: "google/gemini-2.5-flash-lite",
           messages: [
             { role: "system", content: "You are MegaKUMUL Image Analyst. Analyze images and provide detailed descriptions. Use markdown formatting." },
             { role: "user", content: prompt },
@@ -52,7 +52,7 @@ serve(async (req) => {
         "Content-Type": "application/json",
       },
       body: JSON.stringify({
-        model: "google/gemini-3-pro-image-preview",
+        model: "google/gemini-3.1-flash-image-preview",
         messages: [
           {
             role: "user",
