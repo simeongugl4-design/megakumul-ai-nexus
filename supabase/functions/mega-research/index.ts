@@ -60,7 +60,7 @@ CRITICAL DIAGRAM & VISUAL RULES:
         "Content-Type": "application/json",
       },
       body: JSON.stringify({
-        model: "google/gemini-2.5-pro",
+        model: "google/gemini-2.5-flash-lite",
         messages: [
           { role: "system", content: systemPrompt },
           { role: "user", content: `Research the following topic thoroughly and provide a comprehensive answer with citations: ${query}` },
