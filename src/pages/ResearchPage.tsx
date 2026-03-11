@@ -231,9 +231,35 @@ export default function ResearchPage() {
               </motion.div>
             )}
 
+            {/* Follow-up suggestions */}
+            {isComplete && (
+              <motion.div initial={{ opacity: 0, y: 10 }} animate={{ opacity: 1, y: 0 }} transition={{ delay: 0.2 }} className="mb-6">
+                <p className="text-xs font-medium text-muted-foreground mb-3">Search further:</p>
+                <div className="flex flex-wrap gap-2">
+                  {[
+                    `What are the latest developments in ${query.split(' ').slice(0, 4).join(' ')}?`,
+                    `Compare different perspectives on ${query.split(' ').slice(0, 3).join(' ')}`,
+                    `What are the practical applications of ${query.split(' ').slice(0, 3).join(' ')}?`,
+                    `Explain the history of ${query.split(' ').slice(0, 3).join(' ')}`,
+                  ].map((suggestion, i) => (
+                    <motion.button
+                      key={i}
+                      whileHover={{ scale: 1.02 }}
+                      whileTap={{ scale: 0.98 }}
+                      onClick={() => { setInput(suggestion); research(suggestion); }}
+                      className="flex items-center gap-1.5 rounded-xl border border-border px-3 py-2 text-xs text-muted-foreground hover:border-secondary/50 hover:text-foreground hover:bg-secondary/5 transition-all"
+                    >
+                      <Search className="h-3 w-3 text-secondary" />
+                      <span className="line-clamp-1 max-w-[200px]">{suggestion}</span>
+                    </motion.button>
+                  ))}
+                </div>
+              </motion.div>
+            )}
+
             {/* Follow-up search */}
             {isComplete && (
-              <motion.div initial={{ opacity: 0, y: 10 }} animate={{ opacity: 1, y: 0 }} transition={{ delay: 0.3 }}>
+              <motion.div initial={{ opacity: 0, y: 10 }} animate={{ opacity: 1, y: 0 }} transition={{ delay: 0.4 }}>
                 <form onSubmit={(e) => { e.preventDefault(); handleSubmit(); }} className="flex items-center gap-2 rounded-xl border border-border bg-card p-2">
                   <Search className="ml-2 h-4 w-4 text-muted-foreground" />
                   <input value={input} onChange={(e) => setInput(e.target.value)} placeholder="Ask a follow-up question..." className="flex-1 bg-transparent text-sm text-foreground placeholder:text-muted-foreground focus:outline-none py-1" />

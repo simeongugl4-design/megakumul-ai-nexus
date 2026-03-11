@@ -139,6 +139,24 @@ export default function CodeAssistantPage() {
                   )}
                 </div>
 
+                {!isLoading && content && (
+                  <div className="mt-4 mb-2">
+                    <p className="text-xs font-medium text-muted-foreground mb-2">Continue exploring:</p>
+                    <div className="flex flex-wrap gap-2">
+                      {[
+                        "Add error handling and edge cases",
+                        "Write unit tests for this code",
+                        "Optimize for performance",
+                        "Explain this code step by step",
+                      ].map((s, i) => (
+                        <button key={i} onClick={() => { setInput(s); setLastQuery(s); generate(s, language, action); }} className="rounded-lg border border-border px-3 py-1.5 text-xs text-muted-foreground hover:border-[hsl(150,80%,50%)]/50 hover:text-foreground transition-all">
+                          {s}
+                        </button>
+                      ))}
+                    </div>
+                  </div>
+                )}
+
                 {!isLoading && (
                   <form onSubmit={handleSubmit} className="mt-4 flex items-center gap-2 rounded-xl border border-border bg-card p-2">
                     <textarea value={input} onChange={(e) => setInput(e.target.value)} placeholder="Ask a follow-up..." rows={1} className="flex-1 bg-transparent text-sm text-foreground placeholder:text-muted-foreground focus:outline-none resize-none" onKeyDown={(e) => { if (e.key === "Enter" && !e.shiftKey) { e.preventDefault(); handleSubmit(); } }} />
