@@ -24,7 +24,23 @@ serve(async (req) => {
         messages: [
           {
             role: "user",
-            content: `Create a clear, professional, educational diagram or graph illustration for the following topic. Make it colorful, well-labeled with axis labels, titles, and annotations. Use a clean white background. Style it like a textbook illustration with clear mathematical notation. DO NOT use dotted lines - use solid lines only: ${prompt}`,
+            content: `Create a REALISTIC, high-quality, professional educational diagram for this topic. 
+
+CRITICAL STYLE REQUIREMENTS:
+- PHOTOREALISTIC 3D rendering style with depth, lighting, and shadows
+- Use SOLID, THICK lines — absolutely NO dotted lines, NO dashed lines
+- All numbers, labels, and text must be LARGE, BOLD, and clearly readable (minimum 14pt equivalent)
+- Use vibrant, high-contrast colors on a clean white or light gradient background
+- Include proper axis labels with large, bold numbers
+- Add clear title text at the top
+- Use professional textbook-quality illustration style like medical/scientific textbooks
+- Include 3D perspective, depth shading, and realistic textures where appropriate
+- For graphs: use thick solid colored lines, large axis numbers, grid lines, and clear legends
+- For anatomical/scientific diagrams: use realistic rendering with labeled arrows and bold text
+- For mathematical plots: show coordinate axes with large numbered tick marks, thick curve lines
+- Make it look like a high-end textbook illustration or scientific publication figure
+
+Topic: ${prompt}`,
           },
         ],
       }),
@@ -51,16 +67,13 @@ serve(async (req) => {
     const data = await response.json();
     const message = data.choices?.[0]?.message;
     
-    // Try multiple response formats for image extraction
     let imageUrl: string | null = null;
     let text = "";
 
-    // Format 1: images array (Lovable gateway format)
     if (message?.images?.[0]?.image_url?.url) {
       imageUrl = message.images[0].image_url.url;
     }
     
-    // Format 2: content as array of parts (OpenAI multimodal format)
     if (!imageUrl && Array.isArray(message?.content)) {
       for (const part of message.content) {
         if (part.type === "image_url" && part.image_url?.url) {
@@ -71,7 +84,6 @@ serve(async (req) => {
       }
     }
     
-    // Format 3: inline_data with base64
     if (!imageUrl && Array.isArray(message?.content)) {
       for (const part of message.content) {
         if (part.inline_data?.data) {
@@ -81,7 +93,6 @@ serve(async (req) => {
       }
     }
 
-    // Text fallback
     if (!text && typeof message?.content === "string") {
       text = message.content;
     }

@@ -13,19 +13,18 @@ serve(async (req) => {
     const LOVABLE_API_KEY = Deno.env.get("LOVABLE_API_KEY");
     if (!LOVABLE_API_KEY) throw new Error("LOVABLE_API_KEY is not configured");
 
-    const systemPrompt = `You are MegaKUMUL Code Assistant, an expert programming AI. You help users generate, debug, explain, and optimize code.
+    const systemPrompt = `You are MegaKUMUL Code Assistant, an expert programming AI.
 
 Action: ${action || "generate"}
+Target language: ${language || "auto-detect"}
 
 RULES:
 - Always respond with well-formatted markdown
-- Use proper syntax-highlighted code blocks with the language identifier
-- When generating code, write clean, production-ready, well-commented code
+- Use syntax-highlighted code blocks with language identifier
+- Write clean, production-ready, well-commented code
 - When debugging, identify the issue clearly and provide the fix
 - When explaining, break down the code step by step
-- When optimizing, show before/after with explanations
-- Target language: ${language || "auto-detect"}
-- For math in code comments or explanations, use LaTeX: $expression$`;
+- For math in code, use LaTeX: $expression$`;
 
     const response = await fetch("https://ai.gateway.lovable.dev/v1/chat/completions", {
       method: "POST",
@@ -34,7 +33,7 @@ RULES:
         "Content-Type": "application/json",
       },
       body: JSON.stringify({
-        model: "google/gemini-2.5-flash-lite",
+        model: "google/gemini-2.5-flash",
         messages: [
           { role: "system", content: systemPrompt },
           { role: "user", content: prompt },
@@ -45,12 +44,12 @@ RULES:
 
     if (!response.ok) {
       if (response.status === 429) {
-        return new Response(JSON.stringify({ error: "Rate limit exceeded. Please try again in a moment." }), {
+        return new Response(JSON.stringify({ error: "Rate limit exceeded." }), {
           status: 429, headers: { ...corsHeaders, "Content-Type": "application/json" },
         });
       }
       if (response.status === 402) {
-        return new Response(JSON.stringify({ error: "Usage limit reached. Please add credits." }), {
+        return new Response(JSON.stringify({ error: "Usage limit reached." }), {
           status: 402, headers: { ...corsHeaders, "Content-Type": "application/json" },
         });
       }
