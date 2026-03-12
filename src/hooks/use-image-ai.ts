@@ -1,5 +1,6 @@
 import { useState, useCallback } from "react";
 import { readSSEStream } from "@/lib/stream-utils";
+import { useHistory } from "@/hooks/use-history";
 
 const IMAGE_URL = `${import.meta.env.VITE_SUPABASE_URL}/functions/v1/mega-image`;
 
@@ -8,15 +9,16 @@ export function useImageAI() {
   const [imageUrl, setImageUrl] = useState<string | null>(null);
   const [isLoading, setIsLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
+  const { addEntry } = useHistory();
 
   const generate = useCallback(async (prompt: string, action: string = "generate") => {
     setContent("");
     setImageUrl(null);
     setIsLoading(true);
     setError(null);
+    addEntry(prompt, "Image");
 
     if (action === "analyze") {
-      // Streaming text response
       let accumulated = "";
       await readSSEStream({
         url: IMAGE_URL,
@@ -32,7 +34,6 @@ export function useImageAI() {
         },
       });
     } else {
-      // Image generation - JSON response
       try {
         const resp = await fetch(IMAGE_URL, {
           method: "POST",
@@ -59,7 +60,7 @@ export function useImageAI() {
         setIsLoading(false);
       }
     }
-  }, []);
+  }, [addEntry]);
 
   const clear = useCallback(() => {
     setContent("");
