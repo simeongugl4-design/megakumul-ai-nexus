@@ -1,5 +1,6 @@
 import { useState, useCallback } from "react";
 import { streamResearch, parseResearchResponse, ResearchSource } from "@/lib/research-api";
+import { useHistory } from "@/hooks/use-history";
 
 export function useResearch() {
   const [rawContent, setRawContent] = useState("");
@@ -9,6 +10,7 @@ export function useResearch() {
   const [isComplete, setIsComplete] = useState(false);
   const [query, setQuery] = useState("");
   const [error, setError] = useState<string | null>(null);
+  const { addEntry } = useHistory();
 
   const research = useCallback(async (searchQuery: string) => {
     setRawContent("");
@@ -18,6 +20,7 @@ export function useResearch() {
     setIsComplete(false);
     setQuery(searchQuery);
     setError(null);
+    addEntry(searchQuery, "Research");
 
     let accumulated = "";
 
@@ -42,7 +45,7 @@ export function useResearch() {
         setError(err);
       },
     });
-  }, []);
+  }, [addEntry]);
 
   const clear = useCallback(() => {
     setRawContent("");

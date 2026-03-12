@@ -1,11 +1,13 @@
 import { useState, useCallback } from "react";
 import { Message } from "@/lib/types";
 import { streamChat } from "@/lib/chat-api";
+import { useHistory } from "@/hooks/use-history";
 
 export function useChat() {
   const [messages, setMessages] = useState<Message[]>([]);
   const [isLoading, setIsLoading] = useState(false);
   const [selectedModel, setSelectedModel] = useState("creative");
+  const { addEntry } = useHistory();
 
   const sendMessage = useCallback(async (content: string) => {
     const userMsg: Message = {
@@ -17,6 +19,7 @@ export function useChat() {
 
     setMessages((prev) => [...prev, userMsg]);
     setIsLoading(true);
+    addEntry(content, "Chat");
 
     let assistantContent = "";
     const assistantId = crypto.randomUUID();
@@ -61,7 +64,7 @@ export function useChat() {
         ]);
       },
     });
-  }, [messages, selectedModel]);
+  }, [messages, selectedModel, addEntry]);
 
   const clearMessages = useCallback(() => setMessages([]), []);
 
