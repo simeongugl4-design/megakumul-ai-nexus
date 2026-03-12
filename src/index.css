@@ -115,16 +115,18 @@
   }
 }
 
-/* KaTeX Math Rendering - Textbook Quality */
+/* KaTeX Math Rendering - Crystal Clear Textbook Quality */
 .katex {
-  font-size: 1.15em !important;
-  font-weight: 400;
+  font-size: 1.25em !important;
+  font-weight: 500;
+  color: hsl(210, 20%, 95%);
+  letter-spacing: 0.01em;
 }
 
 .katex-display {
   margin: 1.5em 0 !important;
-  padding: 1.25em 1.5em;
-  background: hsl(var(--muted) / 0.5);
+  padding: 1.5em 2em;
+  background: hsl(var(--muted) / 0.6);
   border: 1px solid hsl(var(--border));
   border-radius: 0.75rem;
   overflow-x: auto;
@@ -132,22 +134,31 @@
 }
 
 .katex-display > .katex {
-  font-size: 1.3em !important;
+  font-size: 1.4em !important;
+  font-weight: 500;
 }
 
 .prose .katex-display {
   text-align: center;
 }
 
-/* Inline math styling */
+/* Inline math styling - bright and readable */
 .katex:not(.katex-display .katex) {
-  padding: 0.1em 0.2em;
-  color: hsl(195, 100%, 70%);
+  padding: 0.15em 0.3em;
+  color: hsl(195, 100%, 75%);
+  font-weight: 500;
+}
+
+/* Math numbers extra clarity */
+.katex .mord.mathnormal,
+.katex .mord,
+.katex .mord.text {
+  font-weight: 500;
 }
 
 /* Math fraction clarity */
 .katex .frac-line {
-  border-bottom-width: 0.06em !important;
+  border-bottom-width: 0.08em !important;
 }
 
 /* Improve math table/matrix rendering */
@@ -160,6 +171,14 @@
   overflow-x: auto;
   overflow-y: hidden;
   padding-bottom: 0.25em;
+}
+
+/* Boxed answers stand out */
+.katex .boxed {
+  border: 2px solid hsl(195, 100%, 60%) !important;
+  padding: 0.3em 0.5em !important;
+  border-radius: 0.25em;
+  background: hsl(195, 100%, 50%, 0.08);
 }
 
 @keyframes pulse-glow {

@@ -1,5 +1,6 @@
 import { useState, useCallback } from "react";
 import { readSSEStream } from "@/lib/stream-utils";
+import { useHistory } from "@/hooks/use-history";
 
 const MATH_URL = `${import.meta.env.VITE_SUPABASE_URL}/functions/v1/mega-math`;
 
@@ -7,11 +8,13 @@ export function useMathSolver() {
   const [content, setContent] = useState("");
   const [isLoading, setIsLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
+  const { addEntry } = useHistory();
 
   const solve = useCallback(async (prompt: string) => {
     setContent("");
     setIsLoading(true);
     setError(null);
+    addEntry(prompt, "Math");
     let accumulated = "";
 
     await readSSEStream({
@@ -27,7 +30,7 @@ export function useMathSolver() {
         setError(err);
       },
     });
-  }, []);
+  }, [addEntry]);
 
   const clear = useCallback(() => {
     setContent("");

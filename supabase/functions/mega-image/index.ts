@@ -14,7 +14,6 @@ serve(async (req) => {
     if (!LOVABLE_API_KEY) throw new Error("LOVABLE_API_KEY is not configured");
 
     if (action === "analyze") {
-      // Text-based analysis - use streaming
       const response = await fetch("https://ai.gateway.lovable.dev/v1/chat/completions", {
         method: "POST",
         headers: {
@@ -22,7 +21,7 @@ serve(async (req) => {
           "Content-Type": "application/json",
         },
         body: JSON.stringify({
-          model: "google/gemini-2.5-flash-lite",
+          model: "google/gemini-2.5-flash",
           messages: [
             { role: "system", content: "You are MegaKUMUL Image Analyst. Analyze images and provide detailed descriptions. Use markdown formatting." },
             { role: "user", content: prompt },
@@ -44,7 +43,7 @@ serve(async (req) => {
       });
     }
 
-    // Image generation mode - use image model
+    // Image generation - realistic 3D style
     const response = await fetch("https://ai.gateway.lovable.dev/v1/chat/completions", {
       method: "POST",
       headers: {
@@ -56,7 +55,7 @@ serve(async (req) => {
         messages: [
           {
             role: "user",
-            content: `Generate a high-quality, detailed, 3D-style image based on this description. Make it vivid, colorful, and professional: ${prompt}`,
+            content: `Generate a stunning, PHOTOREALISTIC, high-resolution 3D image based on this description. Use realistic lighting, volumetric shadows, detailed textures, and cinematic composition. Make it look like a professional 3D render or photograph — NOT a flat illustration. Use vivid, rich colors with depth and atmosphere: ${prompt}`,
           },
         ],
       }),
@@ -76,12 +75,10 @@ serve(async (req) => {
     let imageUrl: string | null = null;
     let text = "";
 
-    // Format 1: images array
     if (message?.images?.[0]?.image_url?.url) {
       imageUrl = message.images[0].image_url.url;
     }
 
-    // Format 2: content as array
     if (!imageUrl && Array.isArray(message?.content)) {
       for (const part of message.content) {
         if (part.type === "image_url" && part.image_url?.url) {
@@ -92,7 +89,6 @@ serve(async (req) => {
       }
     }
 
-    // Format 3: inline_data
     if (!imageUrl && Array.isArray(message?.content)) {
       for (const part of message.content) {
         if (part.inline_data?.data) {
