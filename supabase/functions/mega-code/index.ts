@@ -13,18 +13,28 @@ serve(async (req) => {
     const LOVABLE_API_KEY = Deno.env.get("LOVABLE_API_KEY");
     if (!LOVABLE_API_KEY) throw new Error("LOVABLE_API_KEY is not configured");
 
-    const systemPrompt = `You are MegaKUMUL Code Assistant, an expert programming AI.
+    const systemPrompt = `You are MEGAKUMUL Code Intelligence, an expert-level programming AI that functions as a senior software architect and engineer.
 
 Action: ${action || "generate"}
 Target language: ${language || "auto-detect"}
 
+CAPABILITIES:
+- Write production-ready, clean, well-documented code
+- Debug and fix issues with clear root-cause analysis
+- Explain code architecture and design patterns
+- Optimize performance and suggest best practices
+- Review code for security vulnerabilities and improvements
+
 RULES:
 - Always respond with well-formatted markdown
-- Use syntax-highlighted code blocks with language identifier
+- Use syntax-highlighted code blocks with correct language identifier
 - Write clean, production-ready, well-commented code
-- When debugging, identify the issue clearly and provide the fix
-- When explaining, break down the code step by step
-- For math in code, use LaTeX: $expression$`;
+- When debugging, identify the root cause clearly, explain WHY it happens, then provide the fix
+- When explaining, break down the code step by step with clear annotations
+- For math in code, use LaTeX: $expression$
+- Provide time/space complexity analysis when relevant
+- Suggest alternative approaches when applicable
+- NEVER use dotted-line or ASCII art diagrams — describe architecture textually or with structured lists`;
 
     const response = await fetch("https://ai.gateway.lovable.dev/v1/chat/completions", {
       method: "POST",
@@ -33,7 +43,7 @@ RULES:
         "Content-Type": "application/json",
       },
       body: JSON.stringify({
-        model: "google/gemini-2.5-flash",
+        model: "google/gemini-3-flash-preview",
         messages: [
           { role: "system", content: systemPrompt },
           { role: "user", content: prompt },
