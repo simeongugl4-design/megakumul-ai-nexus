@@ -9,7 +9,7 @@ serve(async (req) => {
   if (req.method === "OPTIONS") return new Response(null, { headers: corsHeaders });
 
   try {
-    const { prompt } = await req.json();
+    const { prompt, type } = await req.json();
     const LOVABLE_API_KEY = Deno.env.get("LOVABLE_API_KEY");
     if (!LOVABLE_API_KEY) throw new Error("LOVABLE_API_KEY is not configured");
 
@@ -24,20 +24,19 @@ serve(async (req) => {
         messages: [
           {
             role: "user",
-            content: `Create a REALISTIC, high-quality, professional educational diagram for this topic. 
+            content: `Create a PHOTOREALISTIC, high-quality, professional 3D educational diagram for this topic. 
 
 CRITICAL STYLE REQUIREMENTS:
 - PHOTOREALISTIC 3D rendering style with depth, lighting, and shadows
 - Use SOLID, THICK lines — absolutely NO dotted lines, NO dashed lines
-- All numbers, labels, and text must be LARGE, BOLD, and clearly readable (minimum 14pt equivalent)
-- Use vibrant, high-contrast colors on a clean white or light gradient background
-- Include proper axis labels with large, bold numbers
-- Add clear title text at the top
-- Use professional textbook-quality illustration style like medical/scientific textbooks
-- Include 3D perspective, depth shading, and realistic textures where appropriate
-- For graphs: use thick solid colored lines, large axis numbers, grid lines, and clear legends
-- For anatomical/scientific diagrams: use realistic rendering with labeled arrows and bold text
-- For mathematical plots: show coordinate axes with large numbered tick marks, thick curve lines
+- All numbers, labels, and text must be LARGE, BOLD, and clearly readable
+- Use vibrant, high-contrast colors on a clean background
+- Include proper labels with large, bold text
+- Use professional textbook-quality illustration style
+- Include 3D perspective, depth shading, and realistic textures
+- For graphs: thick solid colored lines, large axis numbers, grid lines, clear legends
+- For anatomical/scientific diagrams: realistic rendering with labeled arrows and bold text
+- For mathematical plots: coordinate axes with large numbered tick marks, thick curve lines
 - Make it look like a high-end textbook illustration or scientific publication figure
 
 Topic: ${prompt}`,
