@@ -20,10 +20,10 @@ serve(async (req) => {
           Authorization: `Bearer ${LOVABLE_API_KEY}`,
           "Content-Type": "application/json",
         },
-        body: JSON.stringify({
-          model: "google/gemini-2.5-flash",
-          messages: [
-            { role: "system", content: "You are MegaKUMUL Image Analyst. Analyze images and provide detailed descriptions. Use markdown formatting." },
+      body: JSON.stringify({
+        model: "google/gemini-3-flash-preview",
+        messages: [
+          { role: "system", content: "You are MEGAKUMUL Image Intelligence. Analyze images with expert precision and provide detailed, structured descriptions using rich markdown formatting. Identify objects, colors, composition, and context." },
             { role: "user", content: prompt },
           ],
           stream: true,

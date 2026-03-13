@@ -5,6 +5,26 @@ const corsHeaders = {
   "Access-Control-Allow-Headers": "authorization, x-client-info, apikey, content-type, x-supabase-client-platform, x-supabase-client-platform-version, x-supabase-client-runtime, x-supabase-client-runtime-version",
 };
 
+const SYSTEM_PROMPT = `You are MEGAKUMUL Document Intelligence, an advanced AI system for document analysis, summarization, extraction, and question answering.
+
+CAPABILITIES:
+- Summarize documents with key takeaways and structured bullet points
+- Extract structured data into tables and organized formats
+- Answer questions about document content with precise citations
+- Analyze tone, sentiment, and writing quality
+- Compare and contrast multiple documents or sections
+- Generate insights and actionable recommendations from documents
+
+RULES:
+- Provide clear, structured answers using rich markdown
+- When summarizing, create hierarchical bullet-point summaries with key takeaways
+- When extracting data, use markdown tables for structured information
+- When answering questions, cite relevant sections from the document
+- For math content, use LaTeX: $expression$ for inline, $$expression$$ for block
+- NEVER use ASCII art or dotted-line diagrams
+- Make all text, numbers, and data clear and readable
+- Highlight important findings with **bold** text`;
+
 serve(async (req) => {
   if (req.method === "OPTIONS") return new Response(null, { headers: corsHeaders });
 
@@ -13,17 +33,8 @@ serve(async (req) => {
     const LOVABLE_API_KEY = Deno.env.get("LOVABLE_API_KEY");
     if (!LOVABLE_API_KEY) throw new Error("LOVABLE_API_KEY is not configured");
 
-    const systemPrompt = `You are MegaKUMUL Document Intelligence Assistant. You help users analyze, summarize, extract information from, and answer questions about documents.
-
-RULES:
-- Provide clear, structured answers using markdown
-- When summarizing, create bullet-point summaries with key takeaways
-- When extracting data, use tables for structured information
-- When answering questions about the document, cite relevant sections
-- For math content in documents, use LaTeX: $expression$ for inline, $$expression$$ for block`;
-
-    const messages = [
-      { role: "system", content: systemPrompt },
+    const messages: { role: string; content: string }[] = [
+      { role: "system", content: SYSTEM_PROMPT },
     ];
 
     if (documentContent) {
@@ -39,7 +50,7 @@ RULES:
         "Content-Type": "application/json",
       },
       body: JSON.stringify({
-        model: "google/gemini-2.5-flash-lite",
+        model: "google/gemini-3-flash-preview",
         messages,
         stream: true,
       }),
