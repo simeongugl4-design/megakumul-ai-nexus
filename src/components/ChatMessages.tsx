@@ -16,12 +16,12 @@ interface ChatMessagesProps {
 }
 
 const followUpActions = [
-  { label: "Continue Answering", icon: ArrowRight, prefix: "Continue and expand on your previous answer with more details: ", color: "text-primary border-primary/30 hover:bg-primary/10" },
-  { label: "Research Deeper", icon: Search, prefix: "Research this topic more deeply with specific facts, data, and sources: ", color: "text-secondary border-secondary/30 hover:bg-secondary/10" },
-  { label: "Explain Simply", icon: Lightbulb, prefix: "Explain the above in simpler terms that anyone can understand: ", color: "text-[hsl(45,90%,55%)] border-[hsl(45,90%,55%)]/30 hover:bg-[hsl(45,90%,55%)]/10" },
-  { label: "Generate Code", icon: Code, prefix: "Generate working code related to the above topic: ", color: "text-[hsl(150,80%,50%)] border-[hsl(150,80%,50%)]/30 hover:bg-[hsl(150,80%,50%)]/10" },
-  { label: "Summarize", icon: ListChecks, prefix: "Provide a concise bullet-point summary of your previous response: ", color: "text-[hsl(30,90%,55%)] border-[hsl(30,90%,55%)]/30 hover:bg-[hsl(30,90%,55%)]/10" },
-  { label: "Regenerate", icon: RefreshCw, prefix: "Please provide a different, improved response to the previous question: ", color: "text-muted-foreground border-border hover:bg-muted" },
+  { label: "Continue Answering", letter: "A", icon: ArrowRight, prefix: "Continue and expand on your previous answer with more details: ", color: "text-primary border-primary/30 hover:bg-primary/10" },
+  { label: "Research Deeper", letter: "B", icon: Search, prefix: "Research this topic more deeply with specific facts, data, and sources: ", color: "text-secondary border-secondary/30 hover:bg-secondary/10" },
+  { label: "Explain Simply", letter: "C", icon: Lightbulb, prefix: "Explain the above in simpler terms that anyone can understand: ", color: "text-[hsl(45,90%,55%)] border-[hsl(45,90%,55%)]/30 hover:bg-[hsl(45,90%,55%)]/10" },
+  { label: "Generate Code", letter: "D", icon: Code, prefix: "Generate working code related to the above topic: ", color: "text-[hsl(150,80%,50%)] border-[hsl(150,80%,50%)]/30 hover:bg-[hsl(150,80%,50%)]/10" },
+  { label: "Summarize", letter: "E", icon: ListChecks, prefix: "Provide a concise bullet-point summary of your previous response: ", color: "text-[hsl(30,90%,55%)] border-[hsl(30,90%,55%)]/30 hover:bg-[hsl(30,90%,55%)]/10" },
+  { label: "Regenerate", letter: "F", icon: RefreshCw, prefix: "Please provide a different, improved response to the previous question: ", color: "text-muted-foreground border-border hover:bg-muted" },
 ];
 
 function CopyButton({ text }: { text: string }) {
