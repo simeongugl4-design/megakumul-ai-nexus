@@ -8,6 +8,7 @@ import { Calculator, ArrowRight, Loader2, RotateCcw, Copy, Check, Upload, Camera
 import { useMathSolver } from "@/hooks/use-math-solver";
 import { TopNav } from "@/components/TopNav";
 import { DiagramPanel } from "@/components/DiagramPanel";
+import { FollowUpOptions } from "@/components/FollowUpOptions";
 import { preprocessLatex } from "@/lib/latex-utils";
 
 const suggestions = [
@@ -45,28 +46,28 @@ export default function MathSolverPage() {
   const handleFileUpload = async (e: React.ChangeEvent<HTMLInputElement>) => {
     const file = e.target.files?.[0];
     if (!file) return;
-
     if (file.type.startsWith("image/")) {
-      // For images, describe and ask to solve
-      const prompt = `I uploaded an image of a math problem. The filename is "${file.name}". Please solve it step by step. (Note: Image analysis is being processed)`;
-      setInput(prompt);
-      setLastQuery(prompt);
-      solve(prompt);
+      const prompt = `I uploaded an image of a math problem. The filename is "${file.name}". Please solve it step by step.`;
+      setInput(prompt); setLastQuery(prompt); solve(prompt);
     } else {
-      // For PDF/text files
       try {
         const text = await file.text();
         const prompt = `Solve the following math problem from the uploaded document:\n\n${text.slice(0, 3000)}`;
-        setInput(prompt);
-        setLastQuery(prompt);
-        solve(prompt);
-      } catch {
-        setInput(`Please solve the math problems in the file "${file.name}"`);
-      }
+        setInput(prompt); setLastQuery(prompt); solve(prompt);
+      } catch { setInput(`Please solve the math problems in the file "${file.name}"`); }
     }
   };
 
   const hasResults = content.length > 0 || isLoading;
+
+  const followUpOptions = [
+    { label: "Graph the function from this problem", query: `Graph the function from: ${lastQuery.slice(0, 60)}` },
+    { label: "Explain the mathematical concept behind this", query: `Explain the mathematical concept behind: ${lastQuery.slice(0, 60)}` },
+    { label: "Give me a similar practice problem", query: `Give me a similar practice problem to: ${lastQuery.slice(0, 60)}` },
+    { label: "Show real-world applications of this math", query: `What are real-world applications of the math in: ${lastQuery.slice(0, 60)}?` },
+    { label: "Solve using an alternative method", query: `Solve this using an alternative method: ${lastQuery.slice(0, 60)}` },
+    { label: "Create a step-by-step tutorial for this type", query: `Create a detailed tutorial for solving problems like: ${lastQuery.slice(0, 60)}` },
+  ];
 
   return (
     <div className="flex h-screen flex-col">
@@ -82,29 +83,20 @@ export default function MathSolverPage() {
               <p className="max-w-lg text-muted-foreground">Step-by-step solutions with LaTeX rendering and AI-generated interactive diagrams</p>
             </motion.div>
 
-            {/* Upload options */}
             <motion.div initial={{ opacity: 0, y: 20 }} animate={{ opacity: 1, y: 0 }} transition={{ delay: 0.25 }} className="flex flex-wrap justify-center gap-3 mb-6">
               <input ref={fileRef} type="file" accept=".pdf,.txt,.md,.tex" onChange={handleFileUpload} className="hidden" />
               <input ref={imageRef} type="file" accept="image/*" onChange={handleFileUpload} className="hidden" />
-              <button onClick={() => fileRef.current?.click()} className="flex items-center gap-2 rounded-xl border border-border px-4 py-2.5 text-sm text-muted-foreground hover:text-foreground hover:border-primary/30 transition-all">
-                <FileText className="h-4 w-4 text-primary" /> Upload PDF
-              </button>
-              <button onClick={() => imageRef.current?.click()} className="flex items-center gap-2 rounded-xl border border-border px-4 py-2.5 text-sm text-muted-foreground hover:text-foreground hover:border-primary/30 transition-all">
-                <Upload className="h-4 w-4 text-primary" /> Upload Image
-              </button>
-              <button onClick={() => imageRef.current?.click()} className="flex items-center gap-2 rounded-xl border border-border px-4 py-2.5 text-sm text-muted-foreground hover:text-foreground hover:border-primary/30 transition-all">
-                <Camera className="h-4 w-4 text-primary" /> Scan to Solve
-              </button>
+              <button onClick={() => fileRef.current?.click()} className="flex items-center gap-2 rounded-xl border border-border px-4 py-2.5 text-sm text-muted-foreground hover:text-foreground hover:border-primary/30 transition-all"><FileText className="h-4 w-4 text-primary" /> Upload PDF</button>
+              <button onClick={() => imageRef.current?.click()} className="flex items-center gap-2 rounded-xl border border-border px-4 py-2.5 text-sm text-muted-foreground hover:text-foreground hover:border-primary/30 transition-all"><Upload className="h-4 w-4 text-primary" /> Upload Image</button>
+              <button onClick={() => imageRef.current?.click()} className="flex items-center gap-2 rounded-xl border border-border px-4 py-2.5 text-sm text-muted-foreground hover:text-foreground hover:border-primary/30 transition-all"><Camera className="h-4 w-4 text-primary" /> Scan to Solve</button>
             </motion.div>
 
             <motion.form initial={{ opacity: 0, y: 20 }} animate={{ opacity: 1, y: 0 }} transition={{ delay: 0.3 }} onSubmit={handleSubmit} className="w-full max-w-2xl mb-10">
               <div className="rounded-2xl border border-border bg-card p-3 focus-within:border-primary/50 focus-within:glow-primary">
-                <textarea ref={inputRef} value={input} onChange={(e) => setInput(e.target.value)} placeholder="Type a math problem... e.g. 'Solve ∫ x²sin(x) dx' or 'Graph the function y = x³ - 3x'" rows={4} className="w-full bg-transparent text-sm text-foreground placeholder:text-muted-foreground focus:outline-none resize-none" onKeyDown={(e) => { if (e.key === "Enter" && (e.metaKey || e.ctrlKey)) handleSubmit(); }} />
+                <textarea ref={inputRef} value={input} onChange={(e) => setInput(e.target.value)} placeholder="Type a math problem... e.g. 'Solve ∫ x²sin(x) dx' or 'Find eigenvalues of [[3,1],[1,3]]'" rows={4} className="w-full bg-transparent text-sm text-foreground placeholder:text-muted-foreground focus:outline-none resize-none" onKeyDown={(e) => { if (e.key === "Enter" && (e.metaKey || e.ctrlKey)) handleSubmit(); }} />
                 <div className="flex justify-between items-center mt-2">
                   <span className="text-[10px] text-muted-foreground">Ctrl+Enter to submit</span>
-                  <button type="submit" disabled={!input.trim()} className="rounded-xl px-5 py-2 text-sm font-medium gradient-primary text-primary-foreground transition-all disabled:opacity-30 hover:opacity-90">
-                    Solve <ArrowRight className="inline h-4 w-4 ml-1" />
-                  </button>
+                  <button type="submit" disabled={!input.trim()} className="rounded-xl px-5 py-2 text-sm font-medium gradient-primary text-primary-foreground transition-all disabled:opacity-30 hover:opacity-90">Solve <ArrowRight className="inline h-4 w-4 ml-1" /></button>
                 </div>
               </div>
             </motion.form>
@@ -139,7 +131,6 @@ export default function MathSolverPage() {
               </div>
             </div>
 
-            {/* Main solution - full width */}
             <div className="rounded-2xl border border-border bg-card p-6 mb-6">
               {error ? <p className="text-destructive">⚠️ {error}</p> : (
                 <div className="prose prose-sm prose-invert max-w-none prose-headings:font-heading prose-headings:gradient-text prose-code:text-primary prose-pre:bg-muted prose-pre:border prose-pre:border-border">
@@ -148,44 +139,26 @@ export default function MathSolverPage() {
               )}
             </div>
 
-            {/* Diagram BELOW the answer */}
             {lastQuery && !isLoading && content && (
               <div className="mb-6">
-                <h3 className="text-sm font-heading font-semibold text-foreground mb-3 flex items-center gap-2">
-                  <span className="text-primary">📐</span> AI Diagram
-                </h3>
+                <h3 className="text-sm font-heading font-semibold text-foreground mb-3 flex items-center gap-2"><span className="text-primary">📐</span> AI Diagrams</h3>
                 <DiagramPanel query={lastQuery} autoGenerate />
               </div>
             )}
 
-            {/* Follow-up suggestions */}
             {lastQuery && !isLoading && content && (
-              <div className="mb-4">
-                <p className="text-xs font-medium text-muted-foreground mb-3">Explore further:</p>
-                <div className="flex flex-wrap gap-2">
-                  {[
-                    `Graph the function from: ${lastQuery.slice(0, 40)}`,
-                    `Explain the concept behind this problem`,
-                    `Give me a similar practice problem`,
-                    `What are real-world applications of this?`,
-                  ].map((suggestion, i) => (
-                    <motion.button
-                      key={i}
-                      whileHover={{ scale: 1.02 }}
-                      whileTap={{ scale: 0.98 }}
-                      onClick={() => { setInput(suggestion); setLastQuery(suggestion); solve(suggestion); }}
-                      className="flex items-center gap-1.5 rounded-xl border border-border px-3 py-2 text-xs text-muted-foreground hover:border-primary/50 hover:text-foreground hover:bg-primary/5 transition-all"
-                    >
-                      <Calculator className="h-3 w-3 text-primary" />
-                      <span className="line-clamp-1 max-w-[200px]">{suggestion}</span>
-                    </motion.button>
-                  ))}
-                </div>
+              <div className="mb-6">
+                <FollowUpOptions
+                  options={followUpOptions}
+                  onSelect={(q) => { setInput(q); setLastQuery(q); solve(q); }}
+                  icon={Calculator}
+                />
               </div>
             )}
 
             {!isLoading && (
               <form onSubmit={handleSubmit} className="flex items-center gap-2 rounded-xl border border-border bg-card p-2">
+                <Calculator className="ml-2 h-4 w-4 text-muted-foreground" />
                 <textarea value={input} onChange={(e) => setInput(e.target.value)} placeholder="Ask a follow-up or new problem..." rows={1} className="flex-1 bg-transparent text-sm text-foreground placeholder:text-muted-foreground focus:outline-none resize-none" onKeyDown={(e) => { if (e.key === "Enter" && !e.shiftKey) { e.preventDefault(); handleSubmit(); } }} />
                 <button type="submit" disabled={!input.trim()} className="rounded-lg px-3 py-1.5 text-xs font-medium gradient-primary text-primary-foreground disabled:opacity-30">Solve</button>
               </form>

@@ -5,6 +5,7 @@ import remarkGfm from "remark-gfm";
 import { ImageIcon, ArrowRight, Loader2, RotateCcw, Sparkles, Eye, Download, ZoomIn, ZoomOut } from "lucide-react";
 import { useImageAI } from "@/hooks/use-image-ai";
 import { TopNav } from "@/components/TopNav";
+import { FollowUpOptions } from "@/components/FollowUpOptions";
 
 const actions = [
   { id: "generate", label: "Generate Image", icon: Sparkles, desc: "Create an AI image" },
@@ -24,6 +25,7 @@ export default function ImageAIPage() {
   const [action, setAction] = useState("generate");
   const [selectedModel, setSelectedModel] = useState("creative");
   const [zoom, setZoom] = useState(1);
+  const [allImages, setAllImages] = useState<{ url: string; prompt: string }[]>([]);
   const inputRef = useRef<HTMLTextAreaElement>(null);
 
   const handleSubmit = (e?: React.FormEvent) => {
@@ -33,17 +35,34 @@ export default function ImageAIPage() {
     generate(input.trim(), action);
   };
 
-  const handleDownload = () => {
-    if (!imageUrl) return;
+  // Track generated images
+  const prevImageUrl = useRef<string | null>(null);
+  if (imageUrl && imageUrl !== prevImageUrl.current) {
+    prevImageUrl.current = imageUrl;
+    if (!allImages.find(img => img.url === imageUrl)) {
+      setAllImages(prev => [...prev, { url: imageUrl, prompt: input }]);
+    }
+  }
+
+  const handleDownload = (url: string) => {
     const a = document.createElement("a");
-    a.href = imageUrl;
+    a.href = url;
     a.download = `megakumul-image-${Date.now()}.png`;
     document.body.appendChild(a);
     a.click();
     document.body.removeChild(a);
   };
 
-  const hasResults = content.length > 0 || imageUrl || isLoading;
+  const hasResults = content.length > 0 || imageUrl || isLoading || allImages.length > 0;
+
+  const followUpOptions = [
+    { label: "Generate a variation of this image", query: `Create a variation of: ${input.slice(0, 60)}` },
+    { label: "Make it more photorealistic", query: `Make this more photorealistic and detailed: ${input.slice(0, 60)}` },
+    { label: "Change to a different art style", query: `Recreate in a completely different art style: ${input.slice(0, 60)}` },
+    { label: "Add more detail and depth", query: `Add more intricate detail, depth and lighting to: ${input.slice(0, 60)}` },
+    { label: "Create a panoramic version", query: `Create a wide panoramic version of: ${input.slice(0, 60)}` },
+    { label: "Generate the opposite scene", query: `Generate the opposite/contrasting scene of: ${input.slice(0, 60)}` },
+  ];
 
   return (
     <div className="flex h-screen flex-col">
@@ -91,64 +110,49 @@ export default function ImageAIPage() {
             </motion.div>
           </div>
         ) : (
-          <div className="mx-auto max-w-4xl px-4 py-8">
+          <div className="mx-auto max-w-5xl px-4 py-8">
             <div className="flex items-center justify-between mb-6">
               <div className="flex items-center gap-2 text-sm">
                 <ImageIcon className="h-4 w-4 text-[hsl(45,90%,55%)]" />
                 <span className="text-muted-foreground">Image AI</span>
                 {isLoading && <Loader2 className="h-3 w-3 animate-spin text-[hsl(45,90%,55%)]" />}
               </div>
-              <button onClick={() => { clear(); setInput(""); setZoom(1); }} className="flex items-center gap-1.5 rounded-lg border border-border px-3 py-1.5 text-xs text-muted-foreground hover:bg-muted hover:text-foreground">
+              <button onClick={() => { clear(); setInput(""); setZoom(1); setAllImages([]); prevImageUrl.current = null; }} className="flex items-center gap-1.5 rounded-lg border border-border px-3 py-1.5 text-xs text-muted-foreground hover:bg-muted hover:text-foreground">
                 <RotateCcw className="h-3 w-3" /> New
               </button>
             </div>
 
-            {/* Loading */}
             {isLoading && !imageUrl && !content && (
               <div className="rounded-2xl border border-border bg-card p-12 text-center">
                 <Loader2 className="mx-auto h-10 w-10 animate-spin text-[hsl(45,90%,55%)] mb-4" />
-                <p className="text-sm text-muted-foreground">
-                  {action === "generate" ? "Generating your AI image..." : "Analyzing..."}
-                </p>
+                <p className="text-sm text-muted-foreground">{action === "generate" ? "Generating your AI image..." : "Analyzing..."}</p>
                 <p className="text-xs text-muted-foreground/60 mt-1">This may take 10-20 seconds</p>
               </div>
             )}
 
-            {/* Generated Image */}
-            {imageUrl && (
-              <motion.div initial={{ opacity: 0, y: 20 }} animate={{ opacity: 1, y: 0 }} className="mb-6">
-                <div className="rounded-2xl border border-border bg-card overflow-hidden">
-                  <div className="flex items-center justify-between px-4 py-2 border-b border-border bg-muted/50">
-                    <span className="text-xs font-medium text-muted-foreground">Generated Image</span>
-                    <div className="flex items-center gap-1">
-                      <button onClick={() => setZoom(z => Math.max(0.25, z - 0.25))} className="rounded-md p-1.5 text-muted-foreground hover:bg-muted hover:text-foreground" title="Zoom out">
-                        <ZoomOut className="h-4 w-4" />
-                      </button>
-                      <span className="text-xs text-muted-foreground min-w-[3rem] text-center">{Math.round(zoom * 100)}%</span>
-                      <button onClick={() => setZoom(z => Math.min(3, z + 0.25))} className="rounded-md p-1.5 text-muted-foreground hover:bg-muted hover:text-foreground" title="Zoom in">
-                        <ZoomIn className="h-4 w-4" />
-                      </button>
-                      <button onClick={handleDownload} className="rounded-md p-1.5 text-muted-foreground hover:bg-muted hover:text-foreground ml-2" title="Download">
-                        <Download className="h-4 w-4" />
-                      </button>
-                    </div>
-                  </div>
-                  <div className="overflow-auto max-h-[600px] bg-[hsl(230,15%,5%)] flex items-center justify-center p-4">
-                    <img
-                      src={imageUrl}
-                      alt="AI Generated"
-                      className="rounded-lg transition-transform duration-200"
-                      style={{ transform: `scale(${zoom})`, transformOrigin: "center" }}
-                    />
-                  </div>
+            {/* All generated images grid */}
+            {allImages.length > 0 && (
+              <div className="mb-6">
+                <div className={`grid gap-4 ${allImages.length === 1 ? "grid-cols-1" : "grid-cols-1 md:grid-cols-2"}`}>
+                  {allImages.map((img, i) => (
+                    <motion.div key={img.url} initial={{ opacity: 0, y: 20 }} animate={{ opacity: 1, y: 0 }} transition={{ delay: i * 0.1 }} className="rounded-2xl border border-border bg-card overflow-hidden">
+                      <div className="flex items-center justify-between px-4 py-2 border-b border-border bg-muted/50">
+                        <span className="text-xs font-medium text-muted-foreground truncate max-w-[200px]">{img.prompt}</span>
+                        <button onClick={() => handleDownload(img.url)} className="rounded-md p-1.5 text-muted-foreground hover:bg-muted hover:text-foreground" title="Download">
+                          <Download className="h-4 w-4" />
+                        </button>
+                      </div>
+                      <div className="overflow-auto max-h-[500px] bg-[hsl(230,15%,5%)] flex items-center justify-center p-4">
+                        <img src={img.url} alt="AI Generated" className="rounded-lg max-w-full" />
+                      </div>
+                    </motion.div>
+                  ))}
                 </div>
-                {content && <p className="mt-2 text-xs text-muted-foreground text-center">{content}</p>}
-              </motion.div>
+              </div>
             )}
 
-            {/* Text content (for analyze mode) */}
             {content && !imageUrl && (
-              <div className="rounded-2xl border border-border bg-card p-6">
+              <div className="rounded-2xl border border-border bg-card p-6 mb-6">
                 {error ? <p className="text-destructive">⚠️ {error}</p> : (
                   <div className="prose prose-sm prose-invert max-w-none prose-headings:font-heading prose-code:text-primary prose-pre:bg-muted prose-pre:border prose-pre:border-border">
                     <ReactMarkdown remarkPlugins={[remarkGfm]}>{content}</ReactMarkdown>
@@ -158,14 +162,25 @@ export default function ImageAIPage() {
             )}
 
             {error && !content && (
-              <div className="rounded-2xl border border-destructive/30 bg-destructive/5 p-6 text-center">
+              <div className="rounded-2xl border border-destructive/30 bg-destructive/5 p-6 text-center mb-6">
                 <p className="text-destructive mb-2">⚠️ {error}</p>
                 <button onClick={() => generate(input, action)} className="text-xs text-primary hover:underline">Try again</button>
               </div>
             )}
 
+            {!isLoading && (allImages.length > 0 || content) && (
+              <div className="mb-6">
+                <FollowUpOptions
+                  options={followUpOptions}
+                  onSelect={(q) => { setInput(q); generate(q, action); }}
+                  icon={ImageIcon}
+                />
+              </div>
+            )}
+
             {!isLoading && (
-              <form onSubmit={handleSubmit} className="mt-4 flex items-center gap-2 rounded-xl border border-border bg-card p-2">
+              <form onSubmit={handleSubmit} className="flex items-center gap-2 rounded-xl border border-border bg-card p-2">
+                <ImageIcon className="ml-2 h-4 w-4 text-muted-foreground" />
                 <textarea value={input} onChange={(e) => setInput(e.target.value)} placeholder="Generate another image..." rows={1} className="flex-1 bg-transparent text-sm text-foreground placeholder:text-muted-foreground focus:outline-none resize-none" onKeyDown={(e) => { if (e.key === "Enter" && !e.shiftKey) { e.preventDefault(); handleSubmit(); } }} />
                 <button type="submit" disabled={!input.trim()} className="rounded-lg px-3 py-1.5 text-xs font-medium bg-[hsl(45,90%,55%)] text-background disabled:opacity-30">Go</button>
               </form>
