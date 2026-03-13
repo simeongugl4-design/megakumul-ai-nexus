@@ -8,6 +8,7 @@ import { Code, ArrowRight, Loader2, Copy, Check, RotateCcw } from "lucide-react"
 import { useCodeAssistant } from "@/hooks/use-code-assistant";
 import { TopNav } from "@/components/TopNav";
 import { DiagramPanel } from "@/components/DiagramPanel";
+import { FollowUpOptions } from "@/components/FollowUpOptions";
 import { preprocessLatex } from "@/lib/latex-utils";
 
 const languages = ["Auto-detect", "Python", "JavaScript", "TypeScript", "Java", "C++", "Rust", "Go", "SQL", "HTML/CSS"];
@@ -50,6 +51,15 @@ export default function CodeAssistantPage() {
 
   const hasResults = content.length > 0 || isLoading;
 
+  const followUpOptions = [
+    { label: "Add error handling and edge cases", query: "Add comprehensive error handling and edge cases to the above code" },
+    { label: "Write unit tests for this code", query: "Write unit tests for the code above with full coverage" },
+    { label: "Optimize for performance", query: "Optimize the above code for better performance and efficiency" },
+    { label: "Explain this code step by step", query: "Explain the above code step by step in detail" },
+    { label: "Convert to a different language", query: `Convert the above code to a different programming language` },
+    { label: "Add documentation and comments", query: "Add comprehensive documentation and inline comments to the above code" },
+  ];
+
   return (
     <div className="flex h-screen flex-col">
       <TopNav selectedModel={selectedModel} onModelChange={setSelectedModel} />
@@ -64,38 +74,28 @@ export default function CodeAssistantPage() {
               <p className="max-w-lg text-muted-foreground">Generate, debug, explain, and optimize code with AI — now with interactive diagrams</p>
             </motion.div>
 
-            {/* Action selector */}
             <motion.div initial={{ opacity: 0, y: 20 }} animate={{ opacity: 1, y: 0 }} transition={{ delay: 0.25 }} className="flex flex-wrap justify-center gap-2 mb-6">
               {actions.map((a) => (
-                <button key={a.id} onClick={() => setAction(a.id)} className={`rounded-xl border px-4 py-2 text-sm font-medium transition-all ${action === a.id ? "border-primary bg-primary/10 text-primary" : "border-border text-muted-foreground hover:border-primary/30 hover:text-foreground"}`}>
-                  {a.label}
-                </button>
+                <button key={a.id} onClick={() => setAction(a.id)} className={`rounded-xl border px-4 py-2 text-sm font-medium transition-all ${action === a.id ? "border-primary bg-primary/10 text-primary" : "border-border text-muted-foreground hover:border-primary/30 hover:text-foreground"}`}>{a.label}</button>
               ))}
             </motion.div>
 
-            {/* Language selector */}
             <motion.div initial={{ opacity: 0, y: 20 }} animate={{ opacity: 1, y: 0 }} transition={{ delay: 0.3 }} className="flex flex-wrap justify-center gap-2 mb-8">
               {languages.map((l) => (
-                <button key={l} onClick={() => setLanguage(l)} className={`rounded-lg border px-3 py-1.5 text-xs transition-all ${language === l ? "border-[hsl(150,80%,50%)] bg-[hsl(150,80%,50%)]/10 text-[hsl(150,80%,50%)]" : "border-border text-muted-foreground hover:text-foreground"}`}>
-                  {l}
-                </button>
+                <button key={l} onClick={() => setLanguage(l)} className={`rounded-lg border px-3 py-1.5 text-xs transition-all ${language === l ? "border-[hsl(150,80%,50%)] bg-[hsl(150,80%,50%)]/10 text-[hsl(150,80%,50%)]" : "border-border text-muted-foreground hover:text-foreground"}`}>{l}</button>
               ))}
             </motion.div>
 
-            {/* Input */}
             <motion.form initial={{ opacity: 0, y: 20 }} animate={{ opacity: 1, y: 0 }} transition={{ delay: 0.35 }} onSubmit={handleSubmit} className="w-full max-w-2xl mb-8">
               <div className="rounded-2xl border border-border bg-card p-3 focus-within:border-[hsl(150,80%,50%)]/50">
                 <textarea ref={inputRef} value={input} onChange={(e) => setInput(e.target.value)} placeholder={`Describe what you want to ${action}...`} rows={4} className="w-full bg-transparent text-sm text-foreground placeholder:text-muted-foreground focus:outline-none resize-none" onKeyDown={(e) => { if (e.key === "Enter" && (e.metaKey || e.ctrlKey)) handleSubmit(); }} />
                 <div className="flex justify-between items-center mt-2">
                   <span className="text-[10px] text-muted-foreground">Ctrl+Enter to submit</span>
-                  <button type="submit" disabled={!input.trim()} className="rounded-xl px-5 py-2 text-sm font-medium bg-[hsl(150,80%,50%)] text-background transition-all disabled:opacity-30 hover:opacity-90">
-                    <ArrowRight className="h-4 w-4" />
-                  </button>
+                  <button type="submit" disabled={!input.trim()} className="rounded-xl px-5 py-2 text-sm font-medium bg-[hsl(150,80%,50%)] text-background transition-all disabled:opacity-30 hover:opacity-90"><ArrowRight className="h-4 w-4" /></button>
                 </div>
               </div>
             </motion.form>
 
-            {/* Suggestions */}
             <motion.div initial={{ opacity: 0, y: 20 }} animate={{ opacity: 1, y: 0 }} transition={{ delay: 0.45 }} className="w-full max-w-2xl">
               <p className="text-center text-sm text-muted-foreground mb-4 font-medium">Try these:</p>
               <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
@@ -120,61 +120,42 @@ export default function CodeAssistantPage() {
                 <button onClick={handleCopy} className="flex items-center gap-1.5 rounded-lg border border-border px-3 py-1.5 text-xs text-muted-foreground hover:bg-muted hover:text-foreground">
                   {copied ? <Check className="h-3 w-3 text-[hsl(150,80%,50%)]" /> : <Copy className="h-3 w-3" />} {copied ? "Copied" : "Copy"}
                 </button>
-                <button onClick={() => { clear(); setInput(""); setLastQuery(""); }} className="flex items-center gap-1.5 rounded-lg border border-border px-3 py-1.5 text-xs text-muted-foreground hover:bg-muted hover:text-foreground">
-                  <RotateCcw className="h-3 w-3" /> New
-                </button>
+                <button onClick={() => { clear(); setInput(""); setLastQuery(""); }} className="flex items-center gap-1.5 rounded-lg border border-border px-3 py-1.5 text-xs text-muted-foreground hover:bg-muted hover:text-foreground"><RotateCcw className="h-3 w-3" /> New</button>
               </div>
             </div>
 
-            <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
-              {/* Main content */}
-              <div className="lg:col-span-2">
-                <div className="rounded-2xl border border-border bg-card p-6">
-                  {error ? (
-                    <p className="text-destructive">⚠️ {error}</p>
-                  ) : (
-                    <div className="prose prose-sm prose-invert max-w-none prose-headings:font-heading prose-code:text-[hsl(150,80%,50%)] prose-pre:bg-[hsl(230,15%,6%)] prose-pre:border prose-pre:border-border prose-pre:rounded-xl">
-                      <ReactMarkdown remarkPlugins={[remarkGfm, remarkMath]} rehypePlugins={[rehypeKatex]}>{preprocessLatex(content)}</ReactMarkdown>
-                    </div>
-                  )}
+            <div className="rounded-2xl border border-border bg-card p-6 mb-6">
+              {error ? <p className="text-destructive">⚠️ {error}</p> : (
+                <div className="prose prose-sm prose-invert max-w-none prose-headings:font-heading prose-code:text-[hsl(150,80%,50%)] prose-pre:bg-[hsl(230,15%,6%)] prose-pre:border prose-pre:border-border prose-pre:rounded-xl">
+                  <ReactMarkdown remarkPlugins={[remarkGfm, remarkMath]} rehypePlugins={[rehypeKatex]}>{preprocessLatex(content)}</ReactMarkdown>
                 </div>
-
-                {!isLoading && content && (
-                  <div className="mt-4 mb-2">
-                    <p className="text-xs font-medium text-muted-foreground mb-2">Continue exploring:</p>
-                    <div className="flex flex-wrap gap-2">
-                      {[
-                        "Add error handling and edge cases",
-                        "Write unit tests for this code",
-                        "Optimize for performance",
-                        "Explain this code step by step",
-                      ].map((s, i) => (
-                        <button key={i} onClick={() => { setInput(s); setLastQuery(s); generate(s, language, action); }} className="rounded-lg border border-border px-3 py-1.5 text-xs text-muted-foreground hover:border-[hsl(150,80%,50%)]/50 hover:text-foreground transition-all">
-                          {s}
-                        </button>
-                      ))}
-                    </div>
-                  </div>
-                )}
-
-                {!isLoading && (
-                  <form onSubmit={handleSubmit} className="mt-4 flex items-center gap-2 rounded-xl border border-border bg-card p-2">
-                    <textarea value={input} onChange={(e) => setInput(e.target.value)} placeholder="Ask a follow-up..." rows={1} className="flex-1 bg-transparent text-sm text-foreground placeholder:text-muted-foreground focus:outline-none resize-none" onKeyDown={(e) => { if (e.key === "Enter" && !e.shiftKey) { e.preventDefault(); handleSubmit(); } }} />
-                    <button type="submit" disabled={!input.trim()} className="rounded-lg px-3 py-1.5 text-xs font-medium bg-[hsl(150,80%,50%)] text-background disabled:opacity-30">Go</button>
-                  </form>
-                )}
-              </div>
-
-              {/* Diagram panel */}
-              <div className="lg:col-span-1">
-                <div className="sticky top-4">
-                  <h3 className="text-sm font-heading font-semibold text-foreground mb-3 flex items-center gap-2">
-                    <span className="text-[hsl(150,80%,50%)]">🎨</span> AI Diagram
-                  </h3>
-                  <DiagramPanel query={lastQuery} autoGenerate />
-                </div>
-              </div>
+              )}
             </div>
+
+            {lastQuery && !isLoading && content && (
+              <div className="mb-6">
+                <h3 className="text-sm font-heading font-semibold text-foreground mb-3 flex items-center gap-2"><span className="text-[hsl(150,80%,50%)]">🎨</span> AI Diagram</h3>
+                <DiagramPanel query={lastQuery} autoGenerate />
+              </div>
+            )}
+
+            {!isLoading && content && (
+              <div className="mb-6">
+                <FollowUpOptions
+                  options={followUpOptions}
+                  onSelect={(q) => { setInput(q); setLastQuery(q); generate(q, language, action); }}
+                  icon={Code}
+                />
+              </div>
+            )}
+
+            {!isLoading && (
+              <form onSubmit={handleSubmit} className="flex items-center gap-2 rounded-xl border border-border bg-card p-2">
+                <Code className="ml-2 h-4 w-4 text-muted-foreground" />
+                <textarea value={input} onChange={(e) => setInput(e.target.value)} placeholder="Ask a follow-up..." rows={1} className="flex-1 bg-transparent text-sm text-foreground placeholder:text-muted-foreground focus:outline-none resize-none" onKeyDown={(e) => { if (e.key === "Enter" && !e.shiftKey) { e.preventDefault(); handleSubmit(); } }} />
+                <button type="submit" disabled={!input.trim()} className="rounded-lg px-3 py-1.5 text-xs font-medium bg-[hsl(150,80%,50%)] text-background disabled:opacity-30">Go</button>
+              </form>
+            )}
           </div>
         )}
       </div>

@@ -7,6 +7,7 @@ import rehypeKatex from "rehype-katex";
 import { FileText, ArrowRight, Loader2, RotateCcw, Upload } from "lucide-react";
 import { useDocumentAI } from "@/hooks/use-document-ai";
 import { TopNav } from "@/components/TopNav";
+import { FollowUpOptions } from "@/components/FollowUpOptions";
 
 const suggestions = [
   "Summarize a research paper about machine learning in healthcare",
@@ -38,6 +39,15 @@ export default function DocumentsPage() {
 
   const hasResults = content.length > 0 || isLoading;
 
+  const followUpOptions = [
+    { label: "Summarize the key points", query: "Summarize the key points from the above" },
+    { label: "Extract all data into a table", query: "Extract all important data into a structured table" },
+    { label: "What are the main conclusions?", query: "What are the main conclusions from this analysis?" },
+    { label: "Generate study notes", query: "Generate comprehensive study notes from the above" },
+    { label: "Find contradictions or gaps", query: "Identify any contradictions, gaps, or missing information" },
+    { label: "Create an executive summary", query: "Create a professional executive summary of the above" },
+  ];
+
   return (
     <div className="flex h-screen flex-col">
       <TopNav selectedModel={selectedModel} onModelChange={setSelectedModel} />
@@ -52,7 +62,6 @@ export default function DocumentsPage() {
               <p className="max-w-lg text-muted-foreground">Upload documents and chat with them — summarize, extract data, and answer questions</p>
             </motion.div>
 
-            {/* File upload */}
             <motion.div initial={{ opacity: 0, y: 20 }} animate={{ opacity: 1, y: 0 }} transition={{ delay: 0.25 }} className="w-full max-w-2xl mb-6">
               <input ref={fileRef} type="file" accept=".txt,.md,.csv,.json,.xml,.html" onChange={handleFileUpload} className="hidden" />
               <button onClick={() => fileRef.current?.click()} className={`w-full rounded-2xl border-2 border-dashed p-8 text-center transition-all hover:border-[hsl(30,90%,55%)]/50 ${docContent ? "border-[hsl(30,90%,55%)]/50 bg-[hsl(30,90%,55%)]/5" : "border-border"}`}>
@@ -65,9 +74,7 @@ export default function DocumentsPage() {
               <div className="rounded-2xl border border-border bg-card p-3 focus-within:border-[hsl(30,90%,55%)]/50">
                 <textarea ref={inputRef} value={input} onChange={(e) => setInput(e.target.value)} placeholder={docContent ? "Ask a question about your document..." : "Describe the document task or paste content..."} rows={3} className="w-full bg-transparent text-sm text-foreground placeholder:text-muted-foreground focus:outline-none resize-none" onKeyDown={(e) => { if (e.key === "Enter" && (e.metaKey || e.ctrlKey)) handleSubmit(); }} />
                 <div className="flex justify-end mt-2">
-                  <button type="submit" disabled={!input.trim()} className="rounded-xl px-5 py-2 text-sm font-medium bg-[hsl(30,90%,55%)] text-background transition-all disabled:opacity-30 hover:opacity-90">
-                    <ArrowRight className="h-4 w-4" />
-                  </button>
+                  <button type="submit" disabled={!input.trim()} className="rounded-xl px-5 py-2 text-sm font-medium bg-[hsl(30,90%,55%)] text-background transition-all disabled:opacity-30 hover:opacity-90"><ArrowRight className="h-4 w-4" /></button>
                 </div>
               </div>
             </motion.form>
@@ -92,36 +99,29 @@ export default function DocumentsPage() {
                 <span className="text-muted-foreground">Document Intelligence</span>
                 {isLoading && <Loader2 className="h-3 w-3 animate-spin text-[hsl(30,90%,55%)]" />}
               </div>
-              <button onClick={() => { clear(); setInput(""); setDocContent(""); }} className="flex items-center gap-1.5 rounded-lg border border-border px-3 py-1.5 text-xs text-muted-foreground hover:bg-muted hover:text-foreground">
-                <RotateCcw className="h-3 w-3" /> New
-              </button>
+              <button onClick={() => { clear(); setInput(""); setDocContent(""); }} className="flex items-center gap-1.5 rounded-lg border border-border px-3 py-1.5 text-xs text-muted-foreground hover:bg-muted hover:text-foreground"><RotateCcw className="h-3 w-3" /> New</button>
             </div>
-            <div className="rounded-2xl border border-border bg-card p-6">
+            <div className="rounded-2xl border border-border bg-card p-6 mb-6">
               {error ? <p className="text-destructive">⚠️ {error}</p> : (
                 <div className="prose prose-sm prose-invert max-w-none prose-headings:font-heading prose-code:text-primary prose-pre:bg-muted prose-pre:border prose-pre:border-border">
                   <ReactMarkdown remarkPlugins={[remarkGfm, remarkMath]} rehypePlugins={[rehypeKatex]}>{content}</ReactMarkdown>
                 </div>
               )}
             </div>
+
             {!isLoading && content && (
-              <div className="mt-4 mb-2">
-                <p className="text-xs font-medium text-muted-foreground mb-2">Explore further:</p>
-                <div className="flex flex-wrap gap-2">
-                  {[
-                    "Summarize the key points",
-                    "Extract all important data into a table",
-                    "What are the main conclusions?",
-                    "Generate study notes from this",
-                  ].map((s, i) => (
-                    <button key={i} onClick={() => { setInput(s); query(s, docContent || undefined); }} className="rounded-lg border border-border px-3 py-1.5 text-xs text-muted-foreground hover:border-[hsl(30,90%,55%)]/50 hover:text-foreground transition-all">
-                      {s}
-                    </button>
-                  ))}
-                </div>
+              <div className="mb-6">
+                <FollowUpOptions
+                  options={followUpOptions}
+                  onSelect={(q) => { setInput(q); query(q, docContent || undefined); }}
+                  icon={FileText}
+                />
               </div>
             )}
+
             {!isLoading && (
-              <form onSubmit={handleSubmit} className="mt-4 flex items-center gap-2 rounded-xl border border-border bg-card p-2">
+              <form onSubmit={handleSubmit} className="flex items-center gap-2 rounded-xl border border-border bg-card p-2">
+                <FileText className="ml-2 h-4 w-4 text-muted-foreground" />
                 <textarea value={input} onChange={(e) => setInput(e.target.value)} placeholder="Ask a follow-up..." rows={1} className="flex-1 bg-transparent text-sm text-foreground placeholder:text-muted-foreground focus:outline-none resize-none" onKeyDown={(e) => { if (e.key === "Enter" && !e.shiftKey) { e.preventDefault(); handleSubmit(); } }} />
                 <button type="submit" disabled={!input.trim()} className="rounded-lg px-3 py-1.5 text-xs font-medium bg-[hsl(30,90%,55%)] text-background disabled:opacity-30">Go</button>
               </form>
