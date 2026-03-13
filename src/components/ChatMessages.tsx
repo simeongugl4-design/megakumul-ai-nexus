@@ -200,6 +200,7 @@ export function ChatMessages({ messages, isLoading, onSend }: ChatMessagesProps)
                   onClick={() => onSend?.(action.prefix)}
                   className={`flex items-center gap-1.5 rounded-xl border px-3 py-2 text-xs font-medium transition-all ${action.color}`}
                 >
+                  <span className="flex h-5 w-5 items-center justify-center rounded bg-primary/10 text-[10px] font-bold text-primary">{action.letter}</span>
                   <action.icon className="h-3.5 w-3.5" />
                   {action.label}
                 </motion.button>
