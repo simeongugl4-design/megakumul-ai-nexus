@@ -39,6 +39,7 @@ const secondaryItems = [
 
 export function AppSidebar() {
   const { state, toggleSidebar } = useSidebar();
+  const { signOut, user } = useAuth();
   const collapsed = state === "collapsed";
 
   return (
