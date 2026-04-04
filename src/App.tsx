@@ -16,6 +16,7 @@ import KnowledgeBasePage from "./pages/KnowledgeBasePage";
 import SavedResponsesPage from "./pages/SavedResponsesPage";
 import HistoryPage from "./pages/HistoryPage";
 import IntegrationsPage from "./pages/IntegrationsPage";
+import PricingPage from "./pages/PricingPage";
 import NotFound from "./pages/NotFound";
 
 const queryClient = new QueryClient();
