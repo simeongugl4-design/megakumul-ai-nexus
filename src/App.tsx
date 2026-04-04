@@ -16,6 +16,7 @@ import KnowledgeBasePage from "./pages/KnowledgeBasePage";
 import SavedResponsesPage from "./pages/SavedResponsesPage";
 import HistoryPage from "./pages/HistoryPage";
 import IntegrationsPage from "./pages/IntegrationsPage";
+import PricingPage from "./pages/PricingPage";
 import NotFound from "./pages/NotFound";
 
 const queryClient = new QueryClient();
@@ -66,6 +67,7 @@ const App = () => (
             <Route path="/saved" element={<SavedResponsesPage />} />
             <Route path="/history" element={<HistoryPage />} />
             <Route path="/integrations" element={<IntegrationsPage />} />
+            <Route path="/pricing" element={<PricingPage />} />
             <Route path="/settings" element={<PlaceholderPage title="Settings" description="Customize your MegaKUMUL experience" />} />
             <Route path="*" element={<NotFound />} />
           </Routes>

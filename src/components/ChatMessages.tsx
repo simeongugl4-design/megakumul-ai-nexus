@@ -8,6 +8,7 @@ import { Message } from "@/lib/types";
 import { Zap, ArrowRight, Search, Lightbulb, Code, ListChecks, RefreshCw, Copy, Check } from "lucide-react";
 import { useState } from "react";
 import { preprocessLatex } from "@/lib/latex-utils";
+import { DiagramPanel } from "@/components/DiagramPanel";
 
 interface ChatMessagesProps {
   messages: Message[];
@@ -160,6 +161,12 @@ export function ChatMessages({ messages, isLoading, onSend }: ChatMessagesProps)
                           {msg.model}
                         </span>
                       )}
+                    </div>
+                  )}
+                  {/* Auto-generate diagram for completed assistant messages */}
+                  {msg.role === "assistant" && !isLoading && msg.content.length > 100 && (
+                    <div className="mt-3 max-w-full">
+                      <DiagramPanel query={msg.content.slice(0, 200)} autoGenerate />
                     </div>
                   )}
                 </div>
