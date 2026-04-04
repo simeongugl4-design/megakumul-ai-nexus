@@ -1,9 +1,10 @@
 import { 
   LayoutDashboard, MessageSquare, Search, FileText, ImageIcon, 
-  Code, BookOpen, Star, Clock, Puzzle, Settings, ChevronLeft, ChevronRight, Calculator, CreditCard
+  Code, BookOpen, Star, Clock, Puzzle, Settings, ChevronLeft, ChevronRight, Calculator, CreditCard, LogOut
 } from "lucide-react";
 import { NavLink } from "@/components/NavLink";
 import { useSidebar } from "@/components/ui/sidebar";
+import { useAuth } from "@/hooks/use-auth";
 import {
   Sidebar,
   SidebarContent,
@@ -38,6 +39,7 @@ const secondaryItems = [
 
 export function AppSidebar() {
   const { state, toggleSidebar } = useSidebar();
+  const { signOut, user } = useAuth();
   const collapsed = state === "collapsed";
 
   return (
@@ -100,7 +102,16 @@ export function AppSidebar() {
         </SidebarGroup>
       </SidebarContent>
 
-      <SidebarFooter className="p-2">
+      <SidebarFooter className="p-2 space-y-1">
+        {user && (
+          <button
+            onClick={signOut}
+            className="flex w-full items-center gap-3 rounded-lg px-3 py-2 text-sm text-destructive transition-colors hover:bg-destructive/10"
+          >
+            <LogOut className="h-4 w-4 shrink-0" />
+            {!collapsed && <span>Sign Out</span>}
+          </button>
+        )}
         <button
           onClick={toggleSidebar}
           className="flex w-full items-center justify-center rounded-lg p-2 text-sidebar-foreground transition-colors hover:bg-sidebar-accent"

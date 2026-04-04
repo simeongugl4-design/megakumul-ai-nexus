@@ -2,9 +2,10 @@ import { Toaster } from "@/components/ui/toaster";
 import { Toaster as Sonner } from "@/components/ui/sonner";
 import { TooltipProvider } from "@/components/ui/tooltip";
 import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
-import { BrowserRouter, Routes, Route } from "react-router-dom";
+import { BrowserRouter, Routes, Route, Navigate } from "react-router-dom";
 import { SidebarProvider } from "@/components/ui/sidebar";
 import { AppSidebar } from "@/components/AppSidebar";
+import { AuthProvider, useAuth } from "@/hooks/use-auth";
 import DashboardPage from "./pages/DashboardPage";
 import ChatPage from "./pages/ChatPage";
 import ResearchPage from "./pages/ResearchPage";
@@ -17,7 +18,10 @@ import SavedResponsesPage from "./pages/SavedResponsesPage";
 import HistoryPage from "./pages/HistoryPage";
 import IntegrationsPage from "./pages/IntegrationsPage";
 import PricingPage from "./pages/PricingPage";
+import AuthPage from "./pages/AuthPage";
+import ResetPasswordPage from "./pages/ResetPasswordPage";
 import NotFound from "./pages/NotFound";
+import { Loader2 } from "lucide-react";
 
 const queryClient = new QueryClient();
 
@@ -30,6 +34,21 @@ function AppLayout({ children }: { children: React.ReactNode }) {
       </div>
     </SidebarProvider>
   );
+}
+
+function ProtectedRoute({ children }: { children: React.ReactNode }) {
+  const { user, isLoading } = useAuth();
+  
+  if (isLoading) {
+    return (
+      <div className="flex min-h-screen items-center justify-center bg-background">
+        <Loader2 className="h-8 w-8 animate-spin text-primary" />
+      </div>
+    );
+  }
+  
+  if (!user) return <Navigate to="/auth" replace />;
+  return <AppLayout>{children}</AppLayout>;
 }
 
 function PlaceholderPage({ title, description }: { title: string; description: string }) {
@@ -54,24 +73,26 @@ const App = () => (
       <Toaster />
       <Sonner />
       <BrowserRouter>
-        <AppLayout>
+        <AuthProvider>
           <Routes>
-            <Route path="/" element={<DashboardPage />} />
-            <Route path="/chat" element={<ChatPage />} />
-            <Route path="/research" element={<ResearchPage />} />
-            <Route path="/documents" element={<DocumentsPage />} />
-            <Route path="/image-ai" element={<ImageAIPage />} />
-            <Route path="/code" element={<CodeAssistantPage />} />
-            <Route path="/math" element={<MathSolverPage />} />
-            <Route path="/knowledge" element={<KnowledgeBasePage />} />
-            <Route path="/saved" element={<SavedResponsesPage />} />
-            <Route path="/history" element={<HistoryPage />} />
-            <Route path="/integrations" element={<IntegrationsPage />} />
-            <Route path="/pricing" element={<PricingPage />} />
-            <Route path="/settings" element={<PlaceholderPage title="Settings" description="Customize your MegaKUMUL experience" />} />
+            <Route path="/auth" element={<AuthPage />} />
+            <Route path="/reset-password" element={<ResetPasswordPage />} />
+            <Route path="/" element={<ProtectedRoute><DashboardPage /></ProtectedRoute>} />
+            <Route path="/chat" element={<ProtectedRoute><ChatPage /></ProtectedRoute>} />
+            <Route path="/research" element={<ProtectedRoute><ResearchPage /></ProtectedRoute>} />
+            <Route path="/documents" element={<ProtectedRoute><DocumentsPage /></ProtectedRoute>} />
+            <Route path="/image-ai" element={<ProtectedRoute><ImageAIPage /></ProtectedRoute>} />
+            <Route path="/code" element={<ProtectedRoute><CodeAssistantPage /></ProtectedRoute>} />
+            <Route path="/math" element={<ProtectedRoute><MathSolverPage /></ProtectedRoute>} />
+            <Route path="/knowledge" element={<ProtectedRoute><KnowledgeBasePage /></ProtectedRoute>} />
+            <Route path="/saved" element={<ProtectedRoute><SavedResponsesPage /></ProtectedRoute>} />
+            <Route path="/history" element={<ProtectedRoute><HistoryPage /></ProtectedRoute>} />
+            <Route path="/integrations" element={<ProtectedRoute><IntegrationsPage /></ProtectedRoute>} />
+            <Route path="/pricing" element={<ProtectedRoute><PricingPage /></ProtectedRoute>} />
+            <Route path="/settings" element={<ProtectedRoute><PlaceholderPage title="Settings" description="Customize your MegaKUMUL experience" /></ProtectedRoute>} />
             <Route path="*" element={<NotFound />} />
           </Routes>
-        </AppLayout>
+        </AuthProvider>
       </BrowserRouter>
     </TooltipProvider>
   </QueryClientProvider>
