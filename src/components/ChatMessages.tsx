@@ -163,6 +163,12 @@ export function ChatMessages({ messages, isLoading, onSend }: ChatMessagesProps)
                       )}
                     </div>
                   )}
+                  {/* Auto-generate diagram for completed assistant messages */}
+                  {msg.role === "assistant" && !isLoading && msg.content.length > 100 && (
+                    <div className="mt-3 max-w-full">
+                      <DiagramPanel query={msg.content.slice(0, 200)} autoGenerate />
+                    </div>
+                  )}
                 </div>
               </div>
             </motion.div>
