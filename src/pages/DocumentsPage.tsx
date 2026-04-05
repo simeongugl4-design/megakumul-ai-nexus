@@ -22,12 +22,14 @@ export default function DocumentsPage() {
   const [input, setInput] = useState("");
   const [docContent, setDocContent] = useState("");
   const [selectedModel, setSelectedModel] = useState("expert");
+  const [lastQuery, setLastQuery] = useState("");
   const inputRef = useRef<HTMLTextAreaElement>(null);
   const fileRef = useRef<HTMLInputElement>(null);
 
   const handleSubmit = (e?: React.FormEvent) => {
     e?.preventDefault();
     if (!input.trim() || isLoading) return;
+    setLastQuery(input.trim());
     query(input.trim(), docContent || undefined);
   };
 
