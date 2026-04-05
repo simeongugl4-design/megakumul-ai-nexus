@@ -9,7 +9,7 @@ serve(async (req) => {
   if (req.method === "OPTIONS") return new Response(null, { headers: corsHeaders });
 
   try {
-    const { prompt, type } = await req.json();
+    const { prompt } = await req.json();
     const LOVABLE_API_KEY = Deno.env.get("LOVABLE_API_KEY");
     if (!LOVABLE_API_KEY) throw new Error("LOVABLE_API_KEY is not configured");
 
@@ -24,30 +24,34 @@ serve(async (req) => {
         messages: [
           {
             role: "user",
-            content: `Create a PHOTOREALISTIC, high-quality, professional 3D educational diagram for this topic. 
+            content: `Create a PHOTOREALISTIC, HIGH-QUALITY, PROFESSIONAL 3D educational diagram with CLEAR LABELS.
 
-CRITICAL STYLE REQUIREMENTS:
-- PHOTOREALISTIC 3D rendering style with depth, lighting, and shadows
-- Use SOLID, THICK lines — absolutely NO dotted lines, NO dashed lines
-- All numbers, labels, and text must be LARGE, BOLD, and clearly readable
-- Use vibrant, high-contrast colors on a clean background
-- Include proper labels with large, bold text
-- Use professional textbook-quality illustration style
-- Include 3D perspective, depth shading, and realistic textures
-- For graphs: thick solid colored lines, large axis numbers, grid lines, clear legends
-- For anatomical/scientific diagrams: realistic rendering with labeled arrows and bold text
-- For mathematical plots: coordinate axes with large numbered tick marks, thick curve lines
-- Make it look like a high-end textbook illustration or scientific publication figure
+CRITICAL REQUIREMENTS:
+1. PHOTOREALISTIC 3D rendering with depth, lighting, shadows, and realistic textures
+2. THICK SOLID lines ONLY — absolutely NO dotted lines, NO dashed lines, NO thin lines
+3. LARGE BOLD LABELS on every key element — each label must be clearly readable
+4. Use ARROWS pointing from labels to their elements
+5. HIGH CONTRAST vibrant colors on a clean dark or gradient background
+6. Include a TITLE at the top in large bold text
+7. Include a LEGEND or key if there are multiple elements
+8. For GRAPHS: thick solid colored curves, large numbered axes, grid lines, clear legends
+9. For SCIENCE: realistic 3D rendering with labeled arrows, annotations, and bold text
+10. For MATH: coordinate axes with large tick marks, thick curves, shaded regions with labels
+11. For PROCESSES: flowchart-style with labeled boxes connected by thick arrows
+12. Make it look like a premium textbook illustration or scientific journal figure
+13. Every diagram element should have a clear text label
+14. Use professional color coding (blue, green, orange, purple) for different elements
 
 Topic: ${prompt}`,
           },
         ],
+        modalities: ["image", "text"],
       }),
     });
 
     if (!response.ok) {
       if (response.status === 429) {
-        return new Response(JSON.stringify({ error: "Rate limit exceeded. Please try again." }), {
+        return new Response(JSON.stringify({ error: "Rate limit exceeded. Please try again in a moment." }), {
           status: 429, headers: { ...corsHeaders, "Content-Type": "application/json" },
         });
       }
@@ -69,10 +73,12 @@ Topic: ${prompt}`,
     let imageUrl: string | null = null;
     let text = "";
 
+    // Check images array (primary format)
     if (message?.images?.[0]?.image_url?.url) {
       imageUrl = message.images[0].image_url.url;
     }
     
+    // Check content array for multimodal
     if (!imageUrl && Array.isArray(message?.content)) {
       for (const part of message.content) {
         if (part.type === "image_url" && part.image_url?.url) {
@@ -83,6 +89,7 @@ Topic: ${prompt}`,
       }
     }
     
+    // Check inline_data format
     if (!imageUrl && Array.isArray(message?.content)) {
       for (const part of message.content) {
         if (part.inline_data?.data) {

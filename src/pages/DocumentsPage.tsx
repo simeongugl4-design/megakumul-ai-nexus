@@ -8,6 +8,7 @@ import { FileText, ArrowRight, Loader2, RotateCcw, Upload } from "lucide-react";
 import { useDocumentAI } from "@/hooks/use-document-ai";
 import { TopNav } from "@/components/TopNav";
 import { FollowUpOptions } from "@/components/FollowUpOptions";
+import { DiagramPanel } from "@/components/DiagramPanel";
 
 const suggestions = [
   "Summarize a research paper about machine learning in healthcare",
@@ -21,12 +22,14 @@ export default function DocumentsPage() {
   const [input, setInput] = useState("");
   const [docContent, setDocContent] = useState("");
   const [selectedModel, setSelectedModel] = useState("expert");
+  const [lastQuery, setLastQuery] = useState("");
   const inputRef = useRef<HTMLTextAreaElement>(null);
   const fileRef = useRef<HTMLInputElement>(null);
 
   const handleSubmit = (e?: React.FormEvent) => {
     e?.preventDefault();
     if (!input.trim() || isLoading) return;
+    setLastQuery(input.trim());
     query(input.trim(), docContent || undefined);
   };
 
@@ -109,11 +112,18 @@ export default function DocumentsPage() {
               )}
             </div>
 
+            {lastQuery && !isLoading && content && (
+              <div className="mb-6">
+                <h3 className="text-sm font-heading font-semibold text-foreground mb-3 flex items-center gap-2"><span className="text-[hsl(30,90%,55%)]">📊</span> AI Diagram</h3>
+                <DiagramPanel query={lastQuery} autoGenerate />
+              </div>
+            )}
+
             {!isLoading && content && (
               <div className="mb-6">
                 <FollowUpOptions
                   options={followUpOptions}
-                  onSelect={(q) => { setInput(q); query(q, docContent || undefined); }}
+                  onSelect={(q) => { setInput(q); setLastQuery(q); query(q, docContent || undefined); }}
                   icon={FileText}
                 />
               </div>
