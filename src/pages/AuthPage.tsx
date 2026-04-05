@@ -38,8 +38,8 @@ export default function AuthPage() {
       if (error) {
         toast({ title: "Signup Error", description: error, variant: "destructive" });
       } else {
-        toast({ title: "Account created!", description: "Please check your email to verify your account." });
-        setMode("login");
+        toast({ title: "Welcome to MegaKUMUL!", description: "Your account is ready." });
+        navigate("/");
       }
       return;
     }
