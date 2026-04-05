@@ -8,6 +8,7 @@ import { FileText, ArrowRight, Loader2, RotateCcw, Upload } from "lucide-react";
 import { useDocumentAI } from "@/hooks/use-document-ai";
 import { TopNav } from "@/components/TopNav";
 import { FollowUpOptions } from "@/components/FollowUpOptions";
+import { DiagramPanel } from "@/components/DiagramPanel";
 
 const suggestions = [
   "Summarize a research paper about machine learning in healthcare",
