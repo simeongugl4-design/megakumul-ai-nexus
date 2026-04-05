@@ -119,10 +119,11 @@ export default function DocumentsPage() {
               </div>
             )}
 
+            {!isLoading && content && (
               <div className="mb-6">
                 <FollowUpOptions
                   options={followUpOptions}
-                  onSelect={(q) => { setInput(q); query(q, docContent || undefined); }}
+                  onSelect={(q) => { setInput(q); setLastQuery(q); query(q, docContent || undefined); }}
                   icon={FileText}
                 />
               </div>
