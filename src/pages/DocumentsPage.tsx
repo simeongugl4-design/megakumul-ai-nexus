@@ -112,7 +112,13 @@ export default function DocumentsPage() {
               )}
             </div>
 
-            {!isLoading && content && (
+            {lastQuery && !isLoading && content && (
+              <div className="mb-6">
+                <h3 className="text-sm font-heading font-semibold text-foreground mb-3 flex items-center gap-2"><span className="text-[hsl(30,90%,55%)]">📊</span> AI Diagram</h3>
+                <DiagramPanel query={lastQuery} autoGenerate />
+              </div>
+            )}
+
               <div className="mb-6">
                 <FollowUpOptions
                   options={followUpOptions}
