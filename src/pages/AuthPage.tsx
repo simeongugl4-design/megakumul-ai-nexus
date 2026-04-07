@@ -142,6 +142,12 @@ export default function AuthPage() {
               <button onClick={() => setMode("login")} className="text-primary hover:underline">Back to sign in</button>
             )}
           </div>
+
+          <div className="mt-3 text-center">
+            <button onClick={() => navigate("/")} className="text-xs text-muted-foreground hover:text-primary hover:underline transition-colors">
+              Skip for now — Continue as Guest →
+            </button>
+          </div>
         </div>
 
         <p className="mt-6 text-center text-xs text-muted-foreground">
