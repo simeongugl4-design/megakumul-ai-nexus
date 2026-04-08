@@ -20,6 +20,7 @@ import IntegrationsPage from "./pages/IntegrationsPage";
 import PricingPage from "./pages/PricingPage";
 import AuthPage from "./pages/AuthPage";
 import ResetPasswordPage from "./pages/ResetPasswordPage";
+import SettingsPage from "./pages/SettingsPage";
 import NotFound from "./pages/NotFound";
 import { Loader2 } from "lucide-react";
 
