@@ -8,9 +8,13 @@ import { TopNav } from "@/components/TopNav";
 import { initPushNotifications, isNativePlatform, sendTestLocalNotification } from "@/lib/push-notifications";
 import { toast } from "sonner";
 
+import { useTheme, Theme } from "@/components/ThemeProvider";
+import { Capacitor } from "@capacitor/core";
+
 export default function SettingsPage() {
   const { user, signOut } = useAuth();
-  const { profile, isLoading, updateProfile, uploadAvatar } = useProfile();
+  const { profile, isLoading, updateProfile, uploadAvatar, registerDeviceToken } = useProfile();
+  const { theme, setTheme } = useTheme();
   const navigate = useNavigate();
   const fileInputRef = useRef<HTMLInputElement>(null);
 
@@ -20,8 +24,7 @@ export default function SettingsPage() {
   const [uploading, setUploading] = useState(false);
   const [selectedModel, setSelectedModel] = useState("creative");
 
-  // Preferences (local for now)
-  const [theme, setTheme] = useState("dark");
+  // Preferences come from profile when available, fall back to local defaults
   const [notifications, setNotifications] = useState(true);
   const [autoSave, setAutoSave] = useState(true);
 
@@ -29,6 +32,9 @@ export default function SettingsPage() {
     if (profile) {
       setDisplayName(profile.display_name || "");
       setBio(profile.bio || "");
+      if (profile.theme && profile.theme !== theme) setTheme(profile.theme as Theme);
+      setNotifications(profile.notifications_enabled);
+      setAutoSave(profile.auto_save);
     }
   }, [profile]);
 
