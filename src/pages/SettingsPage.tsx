@@ -286,7 +286,7 @@ export default function SettingsPage() {
                     <p className="text-xs text-muted-foreground">Automatically save AI responses to history</p>
                   </div>
                   <button
-                    onClick={() => setAutoSave(!autoSave)}
+                    onClick={handleToggleAutoSave}
                     className={`relative inline-flex h-6 w-11 items-center rounded-full transition-colors ${
                       autoSave ? "bg-primary" : "bg-muted"
                     }`}
