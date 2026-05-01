@@ -203,10 +203,13 @@ export default function SettingsPage() {
                     <p className="text-xs text-muted-foreground">Choose your interface theme</p>
                   </div>
                   <div className="flex gap-1 rounded-xl border border-border p-1">
-                    {["dark", "light", "system"].map((t) => (
+                    {(["dark", "light", "system"] as Theme[]).map((t) => (
                       <button
                         key={t}
-                        onClick={() => setTheme(t)}
+                        onClick={() => {
+                          setTheme(t);
+                          updateProfile({ theme: t });
+                        }}
                         className={`rounded-lg px-3 py-1.5 text-xs font-medium capitalize transition-all ${
                           theme === t
                             ? "bg-primary text-primary-foreground"
