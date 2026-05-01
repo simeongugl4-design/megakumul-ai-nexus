@@ -28,14 +28,24 @@ FORMATTING RULES:
 
 Adapt your responses to the user's needs: direct answers for simple questions, deeper explanations for advanced topics. Always deliver maximum value through knowledge, reasoning, and clarity.`;
 
+// Map UI model profiles to gateway model + reasoning settings
+const MODEL_MAP: Record<string, { model: string; reasoning?: { effort: string } }> = {
+  fast:     { model: "google/gemini-2.5-flash-lite" },
+  research: { model: "google/gemini-2.5-pro", reasoning: { effort: "medium" } },
+  creative: { model: "google/gemini-3-flash-preview" },
+  coding:   { model: "openai/gpt-5-mini", reasoning: { effort: "low" } },
+  expert:   { model: "openai/gpt-5", reasoning: { effort: "high" } },
+};
+
 serve(async (req) => {
   if (req.method === "OPTIONS") return new Response(null, { headers: corsHeaders });
 
   try {
     const body = await req.json();
-    const model = body.model;
+    const requestedModel = String(body.model || "creative");
+    const config = MODEL_MAP[requestedModel] || MODEL_MAP.creative;
     let messages = body.messages;
-    
+
     // Handle single message string or {message} field for flexibility
     if (!Array.isArray(messages)) {
       const singleMessage = body.message || (typeof messages === 'string' ? messages : null);
@@ -51,20 +61,23 @@ serve(async (req) => {
     const LOVABLE_API_KEY = Deno.env.get("LOVABLE_API_KEY");
     if (!LOVABLE_API_KEY) throw new Error("LOVABLE_API_KEY is not configured");
 
+    const payload: Record<string, unknown> = {
+      model: config.model,
+      messages: [
+        { role: "system", content: SYSTEM_PROMPT },
+        ...messages,
+      ],
+      stream: true,
+    };
+    if (config.reasoning) payload.reasoning = config.reasoning;
+
     const response = await fetch("https://ai.gateway.lovable.dev/v1/chat/completions", {
       method: "POST",
       headers: {
         Authorization: `Bearer ${LOVABLE_API_KEY}`,
         "Content-Type": "application/json",
       },
-      body: JSON.stringify({
-        model: "google/gemini-3-flash-preview",
-        messages: [
-          { role: "system", content: SYSTEM_PROMPT },
-          ...messages,
-        ],
-        stream: true,
-      }),
+      body: JSON.stringify(payload),
     });
 
     if (!response.ok) {

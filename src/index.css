@@ -55,6 +55,54 @@
     --chat-user: 230 15% 12%;
     --chat-ai: 230 15% 8%;
   }
+
+  .light {
+    --background: 210 20% 98%;
+    --foreground: 230 15% 10%;
+
+    --card: 0 0% 100%;
+    --card-foreground: 230 15% 10%;
+
+    --popover: 0 0% 100%;
+    --popover-foreground: 230 15% 10%;
+
+    --primary: 195 90% 42%;
+    --primary-foreground: 0 0% 100%;
+
+    --secondary: 270 60% 50%;
+    --secondary-foreground: 0 0% 100%;
+
+    --muted: 220 15% 94%;
+    --muted-foreground: 215 15% 40%;
+
+    --accent: 270 60% 50%;
+    --accent-foreground: 0 0% 100%;
+
+    --destructive: 0 72% 48%;
+    --destructive-foreground: 0 0% 100%;
+
+    --border: 220 15% 88%;
+    --input: 220 15% 92%;
+    --ring: 195 90% 42%;
+
+    --sidebar-background: 210 20% 96%;
+    --sidebar-foreground: 230 15% 25%;
+    --sidebar-primary: 195 90% 42%;
+    --sidebar-primary-foreground: 0 0% 100%;
+    --sidebar-accent: 220 15% 92%;
+    --sidebar-accent-foreground: 230 15% 10%;
+    --sidebar-border: 220 15% 86%;
+    --sidebar-ring: 195 90% 42%;
+
+    --glow-primary: 195 90% 42%;
+    --glow-secondary: 270 60% 50%;
+    --gradient-start: 195 90% 42%;
+    --gradient-end: 270 60% 50%;
+    --surface-elevated: 0 0% 100%;
+    --surface-hover: 220 15% 94%;
+    --chat-user: 220 15% 94%;
+    --chat-ai: 0 0% 100%;
+  }
 }
 
 @layer base {

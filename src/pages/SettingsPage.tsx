@@ -8,9 +8,13 @@ import { TopNav } from "@/components/TopNav";
 import { initPushNotifications, isNativePlatform, sendTestLocalNotification } from "@/lib/push-notifications";
 import { toast } from "sonner";
 
+import { useTheme, Theme } from "@/components/ThemeProvider";
+import { Capacitor } from "@capacitor/core";
+
 export default function SettingsPage() {
   const { user, signOut } = useAuth();
-  const { profile, isLoading, updateProfile, uploadAvatar } = useProfile();
+  const { profile, isLoading, updateProfile, uploadAvatar, registerDeviceToken } = useProfile();
+  const { theme, setTheme } = useTheme();
   const navigate = useNavigate();
   const fileInputRef = useRef<HTMLInputElement>(null);
 
@@ -20,8 +24,7 @@ export default function SettingsPage() {
   const [uploading, setUploading] = useState(false);
   const [selectedModel, setSelectedModel] = useState("creative");
 
-  // Preferences (local for now)
-  const [theme, setTheme] = useState("dark");
+  // Preferences come from profile when available, fall back to local defaults
   const [notifications, setNotifications] = useState(true);
   const [autoSave, setAutoSave] = useState(true);
 
@@ -29,6 +32,9 @@ export default function SettingsPage() {
     if (profile) {
       setDisplayName(profile.display_name || "");
       setBio(profile.bio || "");
+      if (profile.theme && profile.theme !== theme) setTheme(profile.theme as Theme);
+      setNotifications(profile.notifications_enabled);
+      setAutoSave(profile.auto_save);
     }
   }, [profile]);
 
@@ -58,22 +64,34 @@ export default function SettingsPage() {
   const handleToggleNotifications = async () => {
     const next = !notifications;
     setNotifications(next);
+    updateProfile({ notifications_enabled: next });
     if (next && isNativePlatform()) {
+      const platform = (Capacitor.getPlatform() as "ios" | "android" | "web");
       const result = await initPushNotifications({
-        onToken: (t) => {
+        onToken: async (t) => {
+          await registerDeviceToken(t, platform);
           toast.success("Push notifications enabled");
-          console.info("Device push token:", t);
         },
         onReceived: (n) => toast(n.title || "Notification", { description: n.body }),
         onError: () => {
           toast.error("Could not enable push notifications");
           setNotifications(false);
+          updateProfile({ notifications_enabled: false });
         },
       });
-      if (!result) setNotifications(false);
+      if (!result) {
+        setNotifications(false);
+        updateProfile({ notifications_enabled: false });
+      }
     } else if (next) {
       toast.info("Push notifications activate when running as a native app");
     }
+  };
+
+  const handleToggleAutoSave = () => {
+    const next = !autoSave;
+    setAutoSave(next);
+    updateProfile({ auto_save: next });
   };
 
   const handleTestNotification = async () => {
@@ -197,10 +215,13 @@ export default function SettingsPage() {
                     <p className="text-xs text-muted-foreground">Choose your interface theme</p>
                   </div>
                   <div className="flex gap-1 rounded-xl border border-border p-1">
-                    {["dark", "light", "system"].map((t) => (
+                    {(["dark", "light", "system"] as Theme[]).map((t) => (
                       <button
                         key={t}
-                        onClick={() => setTheme(t)}
+                        onClick={() => {
+                          setTheme(t);
+                          updateProfile({ theme: t });
+                        }}
                         className={`rounded-lg px-3 py-1.5 text-xs font-medium capitalize transition-all ${
                           theme === t
                             ? "bg-primary text-primary-foreground"
@@ -265,7 +286,7 @@ export default function SettingsPage() {
                     <p className="text-xs text-muted-foreground">Automatically save AI responses to history</p>
                   </div>
                   <button
-                    onClick={() => setAutoSave(!autoSave)}
+                    onClick={handleToggleAutoSave}
                     className={`relative inline-flex h-6 w-11 items-center rounded-full transition-colors ${
                       autoSave ? "bg-primary" : "bg-muted"
                     }`}
