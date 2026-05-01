@@ -64,22 +64,34 @@ export default function SettingsPage() {
   const handleToggleNotifications = async () => {
     const next = !notifications;
     setNotifications(next);
+    updateProfile({ notifications_enabled: next });
     if (next && isNativePlatform()) {
+      const platform = (Capacitor.getPlatform() as "ios" | "android" | "web");
       const result = await initPushNotifications({
-        onToken: (t) => {
+        onToken: async (t) => {
+          await registerDeviceToken(t, platform);
           toast.success("Push notifications enabled");
-          console.info("Device push token:", t);
         },
         onReceived: (n) => toast(n.title || "Notification", { description: n.body }),
         onError: () => {
           toast.error("Could not enable push notifications");
           setNotifications(false);
+          updateProfile({ notifications_enabled: false });
         },
       });
-      if (!result) setNotifications(false);
+      if (!result) {
+        setNotifications(false);
+        updateProfile({ notifications_enabled: false });
+      }
     } else if (next) {
       toast.info("Push notifications activate when running as a native app");
     }
+  };
+
+  const handleToggleAutoSave = () => {
+    const next = !autoSave;
+    setAutoSave(next);
+    updateProfile({ auto_save: next });
   };
 
   const handleTestNotification = async () => {
