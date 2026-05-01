@@ -14,31 +14,67 @@ export type Database = {
   }
   public: {
     Tables: {
+      device_tokens: {
+        Row: {
+          created_at: string
+          id: string
+          platform: string
+          token: string
+          updated_at: string
+          user_id: string
+        }
+        Insert: {
+          created_at?: string
+          id?: string
+          platform: string
+          token: string
+          updated_at?: string
+          user_id: string
+        }
+        Update: {
+          created_at?: string
+          id?: string
+          platform?: string
+          token?: string
+          updated_at?: string
+          user_id?: string
+        }
+        Relationships: []
+      }
       profiles: {
         Row: {
+          auto_save: boolean
           avatar_url: string | null
           bio: string | null
           created_at: string
           display_name: string | null
           id: string
+          notifications_enabled: boolean
+          theme: string
           updated_at: string
           user_id: string
         }
         Insert: {
+          auto_save?: boolean
           avatar_url?: string | null
           bio?: string | null
           created_at?: string
           display_name?: string | null
           id?: string
+          notifications_enabled?: boolean
+          theme?: string
           updated_at?: string
           user_id: string
         }
         Update: {
+          auto_save?: boolean
           avatar_url?: string | null
           bio?: string | null
           created_at?: string
           display_name?: string | null
           id?: string
+          notifications_enabled?: boolean
+          theme?: string
           updated_at?: string
           user_id?: string
         }
