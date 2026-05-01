@@ -9,6 +9,9 @@ export interface Profile {
   display_name: string | null;
   avatar_url: string | null;
   bio: string | null;
+  theme: string;
+  notifications_enabled: boolean;
+  auto_save: boolean;
 }
 
 export function useProfile() {
@@ -33,7 +36,7 @@ export function useProfile() {
     if (error) {
       console.error("Error fetching profile:", error);
     } else {
-      setProfile(data);
+      setProfile(data as Profile | null);
     }
     setIsLoading(false);
   }, [user]);
@@ -43,7 +46,7 @@ export function useProfile() {
   }, [fetchProfile]);
 
   const updateProfile = useCallback(
-    async (updates: { display_name?: string; bio?: string; avatar_url?: string }) => {
+    async (updates: Partial<Pick<Profile, "display_name" | "bio" | "avatar_url" | "theme" | "notifications_enabled" | "auto_save">>) => {
       if (!user) {
         toast({ title: "Not signed in", description: "Please sign in to update your profile.", variant: "destructive" });
         return false;
@@ -59,8 +62,7 @@ export function useProfile() {
         return false;
       }
 
-      setProfile((prev) => (prev ? { ...prev, ...updates } : prev));
-      toast({ title: "Profile updated", description: "Your changes have been saved." });
+      setProfile((prev) => (prev ? { ...prev, ...updates } as Profile : prev));
       return true;
     },
     [user, toast]
@@ -86,7 +88,6 @@ export function useProfile() {
         .from("avatars")
         .getPublicUrl(filePath);
 
-      // Add cache-busting param
       const url = `${publicUrl}?t=${Date.now()}`;
       await updateProfile({ avatar_url: url });
       return url;
@@ -94,5 +95,20 @@ export function useProfile() {
     [user, toast, updateProfile]
   );
 
-  return { profile, isLoading, updateProfile, uploadAvatar, refetch: fetchProfile };
+  const registerDeviceToken = useCallback(
+    async (token: string, platform: "ios" | "android" | "web") => {
+      if (!user) return false;
+      const { error } = await supabase
+        .from("device_tokens")
+        .upsert({ user_id: user.id, token, platform }, { onConflict: "user_id,token" });
+      if (error) {
+        console.error("registerDeviceToken error", error);
+        return false;
+      }
+      return true;
+    },
+    [user]
+  );
+
+  return { profile, isLoading, updateProfile, uploadAvatar, registerDeviceToken, refetch: fetchProfile };
 }
