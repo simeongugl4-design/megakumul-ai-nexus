@@ -1,10 +1,12 @@
 import { useState, useEffect, useRef } from "react";
 import { motion } from "framer-motion";
-import { User, Camera, Save, Mail, Shield, Bell, Palette, Loader2, LogOut } from "lucide-react";
+import { User, Camera, Save, Mail, Shield, Bell, Palette, Loader2, LogOut, Smartphone } from "lucide-react";
 import { useAuth } from "@/hooks/use-auth";
 import { useProfile } from "@/hooks/use-profile";
 import { useNavigate } from "react-router-dom";
 import { TopNav } from "@/components/TopNav";
+import { initPushNotifications, isNativePlatform, sendTestLocalNotification } from "@/lib/push-notifications";
+import { toast } from "sonner";
 
 export default function SettingsPage() {
   const { user, signOut } = useAuth();
@@ -51,6 +53,36 @@ export default function SettingsPage() {
   const handleSignOut = async () => {
     await signOut();
     navigate("/auth");
+  };
+
+  const handleToggleNotifications = async () => {
+    const next = !notifications;
+    setNotifications(next);
+    if (next && isNativePlatform()) {
+      const result = await initPushNotifications({
+        onToken: (t) => {
+          toast.success("Push notifications enabled");
+          console.info("Device push token:", t);
+        },
+        onReceived: (n) => toast(n.title || "Notification", { description: n.body }),
+        onError: () => {
+          toast.error("Could not enable push notifications");
+          setNotifications(false);
+        },
+      });
+      if (!result) setNotifications(false);
+    } else if (next) {
+      toast.info("Push notifications activate when running as a native app");
+    }
+  };
+
+  const handleTestNotification = async () => {
+    if (!isNativePlatform()) {
+      toast.info("Test notifications run on the installed iOS/Android app");
+      return;
+    }
+    await sendTestLocalNotification("MegaKUMUL", "This is a test notification 🎉");
+    toast.success("Test notification scheduled");
   };
 
   const isGuest = !user;
@@ -191,7 +223,7 @@ export default function SettingsPage() {
                     <p className="text-xs text-muted-foreground">Receive updates and alerts</p>
                   </div>
                   <button
-                    onClick={() => setNotifications(!notifications)}
+                    onClick={handleToggleNotifications}
                     className={`relative inline-flex h-6 w-11 items-center rounded-full transition-colors ${
                       notifications ? "bg-primary" : "bg-muted"
                     }`}
@@ -201,6 +233,25 @@ export default function SettingsPage() {
                         notifications ? "translate-x-6" : "translate-x-1"
                       }`}
                     />
+                  </button>
+                </div>
+
+                <div className="flex items-center justify-between">
+                  <div>
+                    <p className="text-sm font-medium text-foreground flex items-center gap-2">
+                      <Smartphone className="h-4 w-4" /> Test push notification
+                    </p>
+                    <p className="text-xs text-muted-foreground">
+                      {isNativePlatform()
+                        ? "Send yourself a test notification"
+                        : "Available on the installed iOS/Android app"}
+                    </p>
+                  </div>
+                  <button
+                    onClick={handleTestNotification}
+                    className="rounded-xl border border-border px-4 py-1.5 text-xs font-medium text-foreground hover:bg-muted/50 transition-colors"
+                  >
+                    Send test
                   </button>
                 </div>
 
