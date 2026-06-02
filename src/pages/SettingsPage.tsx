@@ -1,6 +1,6 @@
 import { useState, useEffect, useRef } from "react";
 import { motion } from "framer-motion";
-import { User, Camera, Save, Mail, Shield, Bell, Palette, Loader2, LogOut, Smartphone } from "lucide-react";
+import { User, Camera, Save, Mail, Shield, Bell, Palette, Loader2, LogOut, Smartphone, EyeOff } from "lucide-react";
 import { useAuth } from "@/hooks/use-auth";
 import { useProfile } from "@/hooks/use-profile";
 import { useNavigate } from "react-router-dom";
@@ -9,6 +9,7 @@ import { initPushNotifications, isNativePlatform, sendTestLocalNotification } fr
 import { toast } from "sonner";
 
 import { useTheme, Theme } from "@/components/ThemeProvider";
+import { useReducedMotion } from "@/hooks/use-reduced-motion";
 import { Capacitor } from "@capacitor/core";
 
 export default function SettingsPage() {
