@@ -12,6 +12,7 @@ export interface Profile {
   theme: string;
   notifications_enabled: boolean;
   auto_save: boolean;
+  reduced_motion: boolean;
 }
 
 export function useProfile() {

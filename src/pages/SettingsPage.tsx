@@ -1,6 +1,6 @@
 import { useState, useEffect, useRef } from "react";
 import { motion } from "framer-motion";
-import { User, Camera, Save, Mail, Shield, Bell, Palette, Loader2, LogOut, Smartphone } from "lucide-react";
+import { User, Camera, Save, Mail, Shield, Bell, Palette, Loader2, LogOut, Smartphone, EyeOff } from "lucide-react";
 import { useAuth } from "@/hooks/use-auth";
 import { useProfile } from "@/hooks/use-profile";
 import { useNavigate } from "react-router-dom";
@@ -9,12 +9,14 @@ import { initPushNotifications, isNativePlatform, sendTestLocalNotification } fr
 import { toast } from "sonner";
 
 import { useTheme, Theme } from "@/components/ThemeProvider";
+import { useReducedMotion } from "@/hooks/use-reduced-motion";
 import { Capacitor } from "@capacitor/core";
 
 export default function SettingsPage() {
   const { user, signOut } = useAuth();
   const { profile, isLoading, updateProfile, uploadAvatar, registerDeviceToken } = useProfile();
   const { theme, setTheme } = useTheme();
+  const { reducedMotion, setReducedMotion } = useReducedMotion();
   const navigate = useNavigate();
   const fileInputRef = useRef<HTMLInputElement>(null);
 
@@ -294,6 +296,29 @@ export default function SettingsPage() {
                     <span
                       className={`inline-block h-4 w-4 rounded-full bg-white transition-transform ${
                         autoSave ? "translate-x-6" : "translate-x-1"
+                      }`}
+                    />
+                  </button>
+                </div>
+
+                <div className="h-px bg-border" />
+
+                <div className="flex items-center justify-between">
+                  <div>
+                    <p className="text-sm font-medium text-foreground flex items-center gap-2">
+                      <EyeOff className="h-4 w-4" /> Reduced motion
+                    </p>
+                    <p className="text-xs text-muted-foreground">Disable breathing and flare animations</p>
+                  </div>
+                  <button
+                    onClick={() => setReducedMotion(!reducedMotion)}
+                    className={`relative inline-flex h-6 w-11 items-center rounded-full transition-colors ${
+                      reducedMotion ? "bg-primary" : "bg-muted"
+                    }`}
+                  >
+                    <span
+                      className={`inline-block h-4 w-4 rounded-full bg-white transition-transform ${
+                        reducedMotion ? "translate-x-6" : "translate-x-1"
                       }`}
                     />
                   </button>

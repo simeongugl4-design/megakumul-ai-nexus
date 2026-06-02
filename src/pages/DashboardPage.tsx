@@ -5,6 +5,7 @@ import { TopNav } from "@/components/TopNav";
 import { useState, useRef } from "react";
 import { Boxes } from "@/components/ui/background-boxes";
 import { SparklesCore } from "@/components/ui/sparkles";
+import { useReducedMotion } from "@/hooks/use-reduced-motion";
 import logoImg from "@/assets/logo.png";
 
 const features = [
@@ -34,6 +35,7 @@ export default function DashboardPage() {
   const navigate = useNavigate();
   const [selectedModel, setSelectedModel] = useState("creative");
   const [hoveredFeature, setHoveredFeature] = useState<number | null>(null);
+  const { reducedMotion } = useReducedMotion();
   const heroRef = useRef<HTMLDivElement>(null);
   const mouseX = useMotionValue(0);
   const mouseY = useMotionValue(0);
@@ -61,7 +63,7 @@ export default function DashboardPage() {
 
           <motion.div initial={{ opacity: 0, y: 40 }} animate={{ opacity: 1, y: 0 }} transition={{ duration: 0.8 }} className="relative z-20 text-center px-6 py-20" style={{ perspective: 1000 }}>
             <motion.div style={{ rotateX, rotateY }} className="will-change-transform">
-              <motion.div initial={{ scale: 0, rotate: -180 }} animate={{ scale: 1, rotate: 0 }} transition={{ type: "spring", stiffness: 200, damping: 15, delay: 0.2 }} className="mx-auto mb-8 flex h-24 w-24 items-center justify-center rounded-3xl overflow-hidden glow-primary logo-sun">
+              <motion.div initial={{ scale: 0, rotate: -180 }} animate={{ scale: 1, rotate: 0 }} transition={{ type: "spring", stiffness: 200, damping: 15, delay: 0.2 }} className={`mx-auto mb-8 flex h-24 w-24 items-center justify-center rounded-3xl overflow-hidden glow-primary ${reducedMotion ? "" : "logo-sun"}`}>
                 <img src={logoImg} alt="MegaKUMUL" className="h-full w-full object-cover" />
               </motion.div>
 

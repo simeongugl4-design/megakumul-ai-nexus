@@ -375,3 +375,56 @@
     0 0 15px hsl(45 100% 55% / 0.35),
     0 0 40px hsl(30 100% 50% / 0.15);
 }
+
+/* ─── Reduced Motion ─── */
+.reduce-motion .logo-sun::before,
+.reduce-motion .logo-sun::after,
+.reduce-motion .logo-sun img,
+.reduce-motion .logo-sun-sm::before,
+.reduce-motion .logo-sun-sm::after,
+.reduce-motion .logo-sun-sm img {
+  animation: none !important;
+}
+
+.reduce-motion .logo-sun::before,
+.reduce-motion .logo-sun-sm::before {
+  opacity: 0;
+}
+
+.reduce-motion .logo-sun::after,
+.reduce-motion .logo-sun-sm::after {
+  opacity: 0.3;
+  transform: none;
+}
+
+.reduce-motion .logo-sun img,
+.reduce-motion .logo-sun-sm img {
+  box-shadow: none;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  html:not(.reduce-motion-override) .logo-sun::before,
+  html:not(.reduce-motion-override) .logo-sun::after,
+  html:not(.reduce-motion-override) .logo-sun img,
+  html:not(.reduce-motion-override) .logo-sun-sm::before,
+  html:not(.reduce-motion-override) .logo-sun-sm::after,
+  html:not(.reduce-motion-override) .logo-sun-sm img {
+    animation: none !important;
+  }
+
+  html:not(.reduce-motion-override) .logo-sun::before,
+  html:not(.reduce-motion-override) .logo-sun-sm::before {
+    opacity: 0;
+  }
+
+  html:not(.reduce-motion-override) .logo-sun::after,
+  html:not(.reduce-motion-override) .logo-sun-sm::after {
+    opacity: 0.3;
+    transform: none;
+  }
+
+  html:not(.reduce-motion-override) .logo-sun img,
+  html:not(.reduce-motion-override) .logo-sun-sm img {
+    box-shadow: none;
+  }
+}
