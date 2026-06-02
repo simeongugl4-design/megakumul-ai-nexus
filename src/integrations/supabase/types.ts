@@ -50,6 +50,7 @@ export type Database = {
           display_name: string | null
           id: string
           notifications_enabled: boolean
+          reduced_motion: boolean
           theme: string
           updated_at: string
           user_id: string
@@ -62,6 +63,7 @@ export type Database = {
           display_name?: string | null
           id?: string
           notifications_enabled?: boolean
+          reduced_motion?: boolean
           theme?: string
           updated_at?: string
           user_id: string
@@ -74,6 +76,7 @@ export type Database = {
           display_name?: string | null
           id?: string
           notifications_enabled?: boolean
+          reduced_motion?: boolean
           theme?: string
           updated_at?: string
           user_id?: string
