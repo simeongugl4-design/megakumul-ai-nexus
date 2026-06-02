@@ -5,6 +5,7 @@ import {
 import { NavLink } from "@/components/NavLink";
 import { useSidebar } from "@/components/ui/sidebar";
 import { useAuth } from "@/hooks/use-auth";
+import { useReducedMotion } from "@/hooks/use-reduced-motion";
 import {
   Sidebar,
   SidebarContent,

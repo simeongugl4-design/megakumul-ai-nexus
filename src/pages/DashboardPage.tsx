@@ -5,6 +5,7 @@ import { TopNav } from "@/components/TopNav";
 import { useState, useRef } from "react";
 import { Boxes } from "@/components/ui/background-boxes";
 import { SparklesCore } from "@/components/ui/sparkles";
+import { useReducedMotion } from "@/hooks/use-reduced-motion";
 import logoImg from "@/assets/logo.png";
 
 const features = [
