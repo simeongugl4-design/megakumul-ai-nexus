@@ -29,7 +29,6 @@ export default function SettingsPage() {
   // Preferences come from profile when available, fall back to local defaults
   const [notifications, setNotifications] = useState(true);
   const [autoSave, setAutoSave] = useState(true);
-  const [reducedMotionLocal, setReducedMotionLocal] = useState(reducedMotion);
 
   useEffect(() => {
     if (profile) {
