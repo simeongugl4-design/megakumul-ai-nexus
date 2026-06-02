@@ -16,6 +16,7 @@ export default function SettingsPage() {
   const { user, signOut } = useAuth();
   const { profile, isLoading, updateProfile, uploadAvatar, registerDeviceToken } = useProfile();
   const { theme, setTheme } = useTheme();
+  const { reducedMotion, setReducedMotion } = useReducedMotion();
   const navigate = useNavigate();
   const fileInputRef = useRef<HTMLInputElement>(null);
 
@@ -28,6 +29,7 @@ export default function SettingsPage() {
   // Preferences come from profile when available, fall back to local defaults
   const [notifications, setNotifications] = useState(true);
   const [autoSave, setAutoSave] = useState(true);
+  const [reducedMotionLocal, setReducedMotionLocal] = useState(reducedMotion);
 
   useEffect(() => {
     if (profile) {
