@@ -300,6 +300,29 @@ export default function SettingsPage() {
                     />
                   </button>
                 </div>
+
+                <div className="h-px bg-border" />
+
+                <div className="flex items-center justify-between">
+                  <div>
+                    <p className="text-sm font-medium text-foreground flex items-center gap-2">
+                      <EyeOff className="h-4 w-4" /> Reduced motion
+                    </p>
+                    <p className="text-xs text-muted-foreground">Disable breathing and flare animations</p>
+                  </div>
+                  <button
+                    onClick={() => setReducedMotion(!reducedMotion)}
+                    className={`relative inline-flex h-6 w-11 items-center rounded-full transition-colors ${
+                      reducedMotion ? "bg-primary" : "bg-muted"
+                    }`}
+                  >
+                    <span
+                      className={`inline-block h-4 w-4 rounded-full bg-white transition-transform ${
+                        reducedMotion ? "translate-x-6" : "translate-x-1"
+                      }`}
+                    />
+                  </button>
+                </div>
               </div>
             </div>
 
