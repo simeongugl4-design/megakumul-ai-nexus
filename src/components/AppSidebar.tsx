@@ -41,13 +41,14 @@ const secondaryItems = [
 export function AppSidebar() {
   const { state, toggleSidebar } = useSidebar();
   const { signOut, user } = useAuth();
+  const { reducedMotion } = useReducedMotion();
   const collapsed = state === "collapsed";
 
   return (
     <Sidebar collapsible="icon" className="border-r border-sidebar-border bg-sidebar">
       <SidebarHeader className="p-4">
         <div className="flex items-center gap-2">
-          <div className="logo-sun logo-sun-sm h-8 w-8 rounded-lg"><img src={logoImg} alt="MegaKUMUL" className="h-8 w-8 rounded-lg object-cover" /></div>
+          <div className={`${reducedMotion ? "" : "logo-sun logo-sun-sm"} h-8 w-8 rounded-lg`}><img src={logoImg} alt="MegaKUMUL" className="h-8 w-8 rounded-lg object-cover" /></div>
           {!collapsed && (
             <span className="text-lg font-heading font-bold gradient-text">
               MegaKUMUL
