@@ -22,6 +22,7 @@ import PricingPage from "./pages/PricingPage";
 import AuthPage from "./pages/AuthPage";
 import ResetPasswordPage from "./pages/ResetPasswordPage";
 import SettingsPage from "./pages/SettingsPage";
+import MemoryPage from "./pages/MemoryPage";
 import NotFound from "./pages/NotFound";
 import { Loader2 } from "lucide-react";
 
@@ -83,6 +84,7 @@ const App = () => (
             <Route path="/integrations" element={<ProtectedRoute><IntegrationsPage /></ProtectedRoute>} />
             <Route path="/pricing" element={<ProtectedRoute><PricingPage /></ProtectedRoute>} />
             <Route path="/settings" element={<ProtectedRoute><SettingsPage /></ProtectedRoute>} />
+            <Route path="/memory" element={<ProtectedRoute><MemoryPage /></ProtectedRoute>} />
             <Route path="*" element={<NotFound />} />
           </Routes>
         </AuthProvider>
