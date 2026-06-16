@@ -33,7 +33,7 @@ export function useChat() {
 
     setMessages((prev) => [...prev, userMsg]);
     setIsLoading(true);
-    addEntry(content, expert.id === "general" ? "Chat" : expert.name);
+    addEntry(content, "Chat");
 
     let assistantContent = "";
     const assistantId = crypto.randomUUID();
