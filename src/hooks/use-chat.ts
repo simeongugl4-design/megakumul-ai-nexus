@@ -2,6 +2,7 @@ import { useState, useCallback } from "react";
 import { Message } from "@/lib/types";
 import { streamChat } from "@/lib/chat-api";
 import { useHistory } from "@/hooks/use-history";
+import { useMemory } from "@/hooks/use-memory";
 import { getExpert } from "@/lib/experts";
 
 export function useChat() {
@@ -13,11 +14,11 @@ export function useChat() {
     return localStorage.getItem("mk_expert") || "general";
   });
   const { addEntry } = useHistory();
+  const { buildContext, captureFromChat } = useMemory();
 
   const setSelectedExpert = useCallback((id: string) => {
     setSelectedExpertState(id);
     try { localStorage.setItem("mk_expert", id); } catch { /* ignore */ }
-    // Auto-suggest the expert's preferred model
     const exp = getExpert(id);
     if (exp.suggestedModel) setSelectedModel(exp.suggestedModel);
   }, []);
@@ -39,12 +40,14 @@ export function useChat() {
     const assistantId = crypto.randomUUID();
 
     const allMessages = [...messages, userMsg];
+    const memoryContext = buildContext();
 
     await streamChat({
       messages: allMessages,
       model: selectedModel,
       expertPrompt: expert.systemPrompt || undefined,
       expertName: expert.name,
+      memoryContext: memoryContext || undefined,
       onDelta: (chunk) => {
         assistantContent += chunk;
         setMessages((prev) => {
@@ -67,7 +70,12 @@ export function useChat() {
           ];
         });
       },
-      onDone: () => setIsLoading(false),
+      onDone: () => {
+        setIsLoading(false);
+        if (assistantContent.length > 30) {
+          captureFromChat(content, assistantContent);
+        }
+      },
       onError: (error) => {
         setIsLoading(false);
         setMessages((prev) => [
@@ -81,7 +89,7 @@ export function useChat() {
         ]);
       },
     });
-  }, [messages, selectedModel, selectedExpert, addEntry]);
+  }, [messages, selectedModel, selectedExpert, addEntry, buildContext, captureFromChat]);
 
   const clearMessages = useCallback(() => setMessages([]), []);
 

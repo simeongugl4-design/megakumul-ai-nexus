@@ -46,6 +46,7 @@ serve(async (req) => {
     const config = MODEL_MAP[requestedModel] || MODEL_MAP.creative;
     const expertPrompt = typeof body.expertPrompt === "string" ? body.expertPrompt : "";
     const expertName = typeof body.expertName === "string" ? body.expertName : "";
+    const memoryContext = typeof body.memoryContext === "string" ? body.memoryContext : "";
     let messages = body.messages;
 
     // Handle single message string or {message} field for flexibility
@@ -66,6 +67,9 @@ serve(async (req) => {
     const systemMessages: Array<{ role: string; content: string }> = [
       { role: "system", content: SYSTEM_PROMPT },
     ];
+    if (memoryContext) {
+      systemMessages.push({ role: "system", content: memoryContext });
+    }
     if (expertPrompt) {
       systemMessages.push({
         role: "system",

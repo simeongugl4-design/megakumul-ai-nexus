@@ -7,6 +7,7 @@ export async function streamChat({
   model,
   expertPrompt,
   expertName,
+  memoryContext,
   onDelta,
   onDone,
   onError,
@@ -15,6 +16,7 @@ export async function streamChat({
   model: string;
   expertPrompt?: string;
   expertName?: string;
+  memoryContext?: string;
   onDelta: (text: string) => void;
   onDone: () => void;
   onError: (error: string) => void;
@@ -31,6 +33,7 @@ export async function streamChat({
         model,
         expertPrompt,
         expertName,
+        memoryContext,
       }),
     });
 
