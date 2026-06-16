@@ -1,20 +1,31 @@
 import { Bell, User } from "lucide-react";
 import { SidebarTrigger } from "@/components/ui/sidebar";
 import { ModelSelector } from "@/components/ModelSelector";
+import { ExpertSelector } from "@/components/ExpertSelector";
 
 interface TopNavProps {
   selectedModel: string;
   onModelChange: (model: string) => void;
+  selectedExpert?: string;
+  onExpertChange?: (id: string) => void;
 }
 
-export function TopNav({ selectedModel, onModelChange }: TopNavProps) {
+export function TopNav({
+  selectedModel,
+  onModelChange,
+  selectedExpert,
+  onExpertChange,
+}: TopNavProps) {
   return (
     <header className="flex h-14 items-center justify-between border-b border-border bg-card px-4">
       <div className="flex items-center gap-3">
         <SidebarTrigger className="text-muted-foreground hover:text-foreground" />
       </div>
 
-      <div className="flex items-center gap-3">
+      <div className="flex items-center gap-2">
+        {selectedExpert && onExpertChange && (
+          <ExpertSelector selected={selectedExpert} onChange={onExpertChange} />
+        )}
         <ModelSelector selected={selectedModel} onChange={onModelChange} />
         <button className="relative rounded-lg p-2 text-muted-foreground transition-colors hover:bg-muted hover:text-foreground">
           <Bell className="h-4 w-4" />

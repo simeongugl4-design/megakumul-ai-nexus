@@ -4,9 +4,18 @@ import { ChatMessages } from "@/components/ChatMessages";
 import { ChatInput } from "@/components/ChatInput";
 import { ToolsPanel } from "@/components/ToolsPanel";
 import { TopNav } from "@/components/TopNav";
+import { getExpert } from "@/lib/experts";
 
 export default function ChatPage() {
-  const { messages, isLoading, sendMessage, selectedModel, setSelectedModel } = useChat();
+  const {
+    messages,
+    isLoading,
+    sendMessage,
+    selectedModel,
+    setSelectedModel,
+    selectedExpert,
+    setSelectedExpert,
+  } = useChat();
   const [inputPrefill, setInputPrefill] = useState("");
   const [prefillKey, setPrefillKey] = useState(0);
 
@@ -16,13 +25,26 @@ export default function ChatPage() {
   }, []);
 
   const handleFollowUp = useCallback((prefix: string) => {
-    // For follow-ups, send immediately since they reference the previous response
     sendMessage(prefix);
   }, [sendMessage]);
 
+  const expert = getExpert(selectedExpert);
+
   return (
     <div className="flex h-screen flex-col">
-      <TopNav selectedModel={selectedModel} onModelChange={setSelectedModel} />
+      <TopNav
+        selectedModel={selectedModel}
+        onModelChange={setSelectedModel}
+        selectedExpert={selectedExpert}
+        onExpertChange={setSelectedExpert}
+      />
+      {expert.id !== "general" && (
+        <div className="flex items-center gap-2 border-b border-border bg-muted/40 px-4 py-2 text-xs text-muted-foreground">
+          <span className="text-base">{expert.icon}</span>
+          <span className="font-medium text-foreground">{expert.name}</span>
+          <span className="opacity-70">— {expert.tagline}</span>
+        </div>
+      )}
       <div className="flex flex-1 overflow-hidden">
         <div className="flex flex-1 flex-col">
           <ChatMessages messages={messages} isLoading={isLoading} onSend={handleFollowUp} />

@@ -4,8 +4,10 @@ export type Message = {
   content: string;
   timestamp: Date;
   model?: string;
+  expert?: string;
   mode?: "answer" | "research";
 };
+
 
 export type FollowUpAction = {
   label: string;
