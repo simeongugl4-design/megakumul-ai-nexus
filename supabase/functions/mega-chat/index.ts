@@ -44,6 +44,8 @@ serve(async (req) => {
     const body = await req.json();
     const requestedModel = String(body.model || "creative");
     const config = MODEL_MAP[requestedModel] || MODEL_MAP.creative;
+    const expertPrompt = typeof body.expertPrompt === "string" ? body.expertPrompt : "";
+    const expertName = typeof body.expertName === "string" ? body.expertName : "";
     let messages = body.messages;
 
     // Handle single message string or {message} field for flexibility
@@ -61,15 +63,23 @@ serve(async (req) => {
     const LOVABLE_API_KEY = Deno.env.get("LOVABLE_API_KEY");
     if (!LOVABLE_API_KEY) throw new Error("LOVABLE_API_KEY is not configured");
 
+    const systemMessages: Array<{ role: string; content: string }> = [
+      { role: "system", content: SYSTEM_PROMPT },
+    ];
+    if (expertPrompt) {
+      systemMessages.push({
+        role: "system",
+        content: `ACTIVE EXPERT AGENT: ${expertName || "Specialist"}\n\n${expertPrompt}`,
+      });
+    }
+
     const payload: Record<string, unknown> = {
       model: config.model,
-      messages: [
-        { role: "system", content: SYSTEM_PROMPT },
-        ...messages,
-      ],
+      messages: [...systemMessages, ...messages],
       stream: true,
     };
     if (config.reasoning) payload.reasoning = config.reasoning;
+
 
     const response = await fetch("https://ai.gateway.lovable.dev/v1/chat/completions", {
       method: "POST",

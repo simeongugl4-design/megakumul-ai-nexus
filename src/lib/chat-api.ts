@@ -5,12 +5,16 @@ const CHAT_URL = `${import.meta.env.VITE_SUPABASE_URL}/functions/v1/mega-chat`;
 export async function streamChat({
   messages,
   model,
+  expertPrompt,
+  expertName,
   onDelta,
   onDone,
   onError,
 }: {
   messages: Pick<Message, "role" | "content">[];
   model: string;
+  expertPrompt?: string;
+  expertName?: string;
   onDelta: (text: string) => void;
   onDone: () => void;
   onError: (error: string) => void;
@@ -25,8 +29,11 @@ export async function streamChat({
       body: JSON.stringify({
         messages: messages.map((m) => ({ role: m.role, content: m.content })),
         model,
+        expertPrompt,
+        expertName,
       }),
     });
+
 
     if (!resp.ok) {
       const data = await resp.json().catch(() => ({ error: "Request failed" }));
